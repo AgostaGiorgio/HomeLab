@@ -8,6 +8,17 @@ ports:
         to: websecure
         scheme: https
         permanent: true
+    port: 80
+    expose:
+      default: true
+  websecure:
+    port: 443
+    expose:
+      default: true
+  traefik:
+    port: 9000
+    expose:
+      default: false
 
 ingressRoute:
   dashboard:
