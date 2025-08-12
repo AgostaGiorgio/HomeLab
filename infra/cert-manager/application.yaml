@@ -13,7 +13,7 @@ spec:
       targetRevision: v1.16.2
       helm:
         valueFiles:
-          - $values/infrastructure/cert-manager/values.yaml
+          - $values/infra/cert-manager/values.yaml
     - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
       targetRevision: master
       ref: values
