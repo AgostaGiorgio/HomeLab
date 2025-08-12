@@ -43,13 +43,13 @@ Start Tailscale and authenticate:
 sudo tailscale up --advertise-routes=192.168.1.0/24
 ```
 
-In this way all the devices in the VPN can access to the server and this is good since we are gonna put a DNS role as follows (Cloudfare example):
+In this way all the devices in the VPN can access to the server and this is good since we are gonna put a DNS role as follows (Cloudflare example):
 ```
 DNS ROLE
 - Type: A
 - Name: *
 - Target: "the static IP of the server in the local network 192.168.1.30"
-**DNS ONLY so in case of Cloudfare, disable the Proxy***ß
+**DNS ONLY so in case of Cloudflare, disable the Proxy***ß
 ```
 
 
