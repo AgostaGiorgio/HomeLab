@@ -1,0 +1,60 @@
+deployment:
+  replicas: 1
+
+ports:
+  web:
+    port: 80
+    hostPort: 80
+    expose:
+      default: true
+    redirections:
+      entryPoint:
+        to: websecure
+        scheme: https
+        permanent: true
+  websecure:
+    port: 443
+    expose:
+      default: true
+  traefik:
+    port: 9000
+    expose:
+      default: false
+
+ingressRoute:
+  dashboard:
+    enabled: true
+    entryPoints:
+      - websecure
+      - web
+    matchRule: Host(`traefik-dashboard.agogi.dev`)
+
+providers:
+  kubernetesCRD:
+    enabled: true
+    allowCrossNamespace: true
+  kubernetesIngress:
+    enabled: true
+    allowExternalNameServices: true
+    publishedService:
+      enabled: true
+
+globalArguments:
+  - "--global.checknewversion=false"
+  - "--global.sendanonymoususage=false"
+
+additionalArguments:
+  - "--log.level=INFO"
+  - "--accesslog=true"
+  - "--entrypoints.web.address=:80"
+  - "--entrypoints.websecure.address=:443"
+  - "--api.dashboard=false"
+  - "--ping=true"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 50Mi
+  limits:
+    cpu: 300m
+    memory: 150Mi
