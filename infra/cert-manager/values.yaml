@@ -1,0 +1,21 @@
+
+crds:
+  enabled: true
+  keep: true
+
+global:
+  logLevel: 2
+  leaderElection:
+    namespace: "cert-manager"
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+extraArgs:
+  - --dns01-recursive-nameservers-only
+  - --dns01-recursive-nameservers=1.1.1.1:53,1.0.0.1:53

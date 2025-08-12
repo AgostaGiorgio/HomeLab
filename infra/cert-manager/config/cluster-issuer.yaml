@@ -1,0 +1,54 @@
+---
+# Let's Encrypt Staging ClusterIssuer for testing
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cloudflare-staging-cluster-issuer
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  acme:
+    email: root@agogi.dev
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: cloudflare-staging-cluster-issuer
+    solvers:
+    - dns01:
+        cloudflare:
+          email: root@agogi.dev
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret
+            key: api-token
+
+---
+# Let's Encrypt Staging ClusterIssuer for production
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cloudflar-production-cluster-issuer
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  acme:
+    email: root@agogi.dev
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: cloudflar-production-cluster-issuer
+    solvers:
+    - dns01:
+        cloudflare:
+          email: root@agogi.dev
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret
+            key: api-token
+
+---
+# Self-signed ClusterIssuer for internal certificates
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  selfSigned: {}
