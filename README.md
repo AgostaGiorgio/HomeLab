@@ -412,7 +412,7 @@ Example of creating a sealed secret for Cloudflare API token:
 # Create the secret (replace with your actual token)
 kubectl create secret generic cloudflare-api-token \
   --from-literal=api-token=your_cloudflare_token_here \
-  --dry-run=client -o yaml | kubeseal -o yaml > cloudflare-token-sealed.yaml
+  --dry-run=client -o yaml | kubeseal --controller-name sealed-secrets --controller-namespace=kube-system -o yaml > cloudflare-api-token.yaml
 
 # Apply the sealed secret
 kubectl apply -f cloudflare-token-sealed.yaml
