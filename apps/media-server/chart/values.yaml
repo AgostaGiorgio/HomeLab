@@ -81,15 +81,10 @@ radarr:
       cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
       traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
       traefik.ingress.kubernetes.io/router.tls: "true"
-    hosts:
-      - host: radarr.agogi.dev
-        paths:
-          - path: /
-            pathType: Prefix
+    host: radarr.agogi.dev
     tls:
-      - hosts:
-          - radarr.agogi.dev
-        secretName: media-server-tls-secret
+      enabled: true
+      secretName: media-server-tls-secret
   
   persistence:
     media:
