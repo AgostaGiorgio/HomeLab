@@ -144,7 +144,7 @@ sonarr:
 
 # Jellyseerr - Request management for Plex/Jellyfin
 jellyseerr:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
