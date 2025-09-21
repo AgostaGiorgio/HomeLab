@@ -1,0 +1,322 @@
+# Global values for the media stack
+global:
+  domain: agogi.dev
+  timezone: "Asia/Dubai"
+  puid: "1000"
+  pgid: "1000"
+
+# Jellyfin - Media server
+jellyfin:
+  enabled: true
+  nameOverride: ""
+  fullnameOverride: ""
+  replicaCount: 1
+  
+  image:
+    repository: jellyfin/jellyfin
+    tag: "10.10.7"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 8096
+  
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    hosts:
+      - host: jellyfin.agogi.dev
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - jellyfin.agogi.dev
+        secretName: media-server-tls-secret
+  
+  persistence:
+    media:
+      enabled: true
+      accessMode: ReadWriteMany
+      size: 50Gi
+      existingClaim: "media-server-pvc"
+  
+  env:
+    JELLYFIN_PublishedServerUrl: "https://jellyfin.agogi.dev"
+    TZ: "Asia/Dubai"
+  
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+
+# Radarr - Movie management
+radarr:
+  enabled: true
+  nameOverride: ""
+  fullnameOverride: ""
+  replicaCount: 1
+  
+  image:
+    repository: linuxserver/radarr
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
+  service:
+    type: ClusterIP
+    port: 7878
+  
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    host: radarr.agogi.dev
+    tls:
+      enabled: true
+      secretName: media-server-tls-secret
+  
+  persistence:
+    media:
+      enabled: true
+      size: 10Gi
+      existingClaim: "media-server-pvc"
+  
+  env:
+    TZ: "Asia/Dubai"
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+
+# Sonarr - TV show management
+sonarr:
+  enabled: true
+  nameOverride: ""
+  fullnameOverride: ""
+  replicaCount: 1
+
+  image:
+    repository: linuxserver/sonarr
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 8989
+  
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    host: sonarr.agogi.dev
+    tls:
+      enabled: true
+      secretName: media-server-tls-secret
+  
+  persistence:
+    media:
+      enabled: true
+      size: 10Gi
+      existingClaim: "media-server-pvc"
+
+  env:
+    TZ: "Asia/Dubai"
+  
+
+# Jellyseerr - Request management for Plex/Jellyfin
+jellyseerr:
+  enabled: false
+  nameOverride: ""
+  fullnameOverride: ""
+  replicaCount: 1
+  
+  image:
+    repository: fallenbagel/jellyseerr
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 5055
+  
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    host: jellyseerr.agogi.dev
+    tls:
+      enabled: true
+      secretName: media-server-tls-secret
+  
+  env:
+    PUID: "1000"
+    PGID: "1000"
+    TZ: "Asia/Dubai"
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+
+# Prowlarr - Indexer manager
+prowlarr:
+  enabled: false
+  nameOverride: ""
+  fullnameOverride: ""
+  replicaCount: 1
+  
+  service:
+    type: ClusterIP
+    port: 9696
+  
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    host: prowlarr.agogi.dev
+    tls:
+      enabled: true
+      secretName: media-server-tls-secret
+  
+  env:
+    PUID: "1000"
+    PGID: "1000"
+    TZ: "Asia/Dubai"
+
+
+# Flaresolverr - Cloudflare solver
+flaresolverr:
+  enabled: false
+  nameOverride: ""
+  fullnameOverride: ""
+  replicaCount: 1
+  
+  image:
+    repository: ghcr.io/flaresolverr/flaresolverr
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8191
+  
+  ingress:
+    enabled: false
+
+
+# Transmission with OpenVPN
+transmission-openvpn:
+  enabled: false
+  nameOverride: ""
+  fullnameOverride: ""
+  replicaCount: 1
+
+  image:
+    repository: haugene/transmission-openvpn
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  env:
+    CREATE_TUN_DEVICE: "false"
+    TZ: "Asia/Dubai"
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    host: transmission.agogi.dev
+    tls:
+      enabled: true
+      secretName: media-server-tls-secret
+
+  persistence:
+    enabled: true
+    size: 10Gi
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  livenessProbe:
+    httpGet:
+      path: /transmission/web/
+      port: 9091
+
+  readinessProbe:
+    tcpSocket:
+      port: 9091
+
+  openvpn:
+    provider: "NORDVPN"
+    credentials:
+      create: false
+      existingSecret: "nordvpn-secrets"
+      
+    config:
+      NORDVPN_COUNTRY: "NL"
+      NORDVPN_CATEGORY: "legacy_p2p"
+      NORDVPN_PROTOCOL: "udp"
+      OPENVPN_OPTS: "--inactive 3600 --ping 10 --ping-exit 60"
+
+  transmission:
+    settings:
+      TRANSMISSION_SPEED_LIMIT_UP: "2048"
+      TRANSMISSION_SPEED_LIMIT_DOWN: "8192"
+      TRANSMISSION_RATIO_LIMIT: "2"
+      TRANSMISSION_RATIO_LIMIT_ENABLED: "true"
+      TRANSMISSION_DOWNLOAD_DIR: "/downloads"
+      TRANSMISSION_INCOMPLETE_DIR: "/downloads/incomplete"
+      TRANSMISSION_WATCH_DIR: "/data/watch"
+      TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "false"
+      TRANSMISSION_RPC_HOST_WHITELIST_ENABLED: "false"
+      TRANSMISSION_RPC_URL: "/transmission/"
+
+  extraEnv:
+    LOCAL_NETWORK: "192.168.0.0/16,10.0.0.0/8,172.16.0.0/12"
+    TRANSMISSION_UMASK: "002"
+
+  extraVolumes:
+    - name: media-server
+      persistentVolumeClaim:
+        claimName: media-server-pvc
+
+  extraVolumeMounts:
+    - name: media-server
+      mountPath: /downloads
+      subPath: downloads

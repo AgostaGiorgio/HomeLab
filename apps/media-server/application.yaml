@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: media
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  sources:
+    - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
+      targetRevision: master
+      path: apps/media/config
+      directory:
+        include: "*.yaml"
+    - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
+      targetRevision: master
+      path: apps/media-server/chart
+      helm:
+        valueFiles:
+          - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: media-server
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
