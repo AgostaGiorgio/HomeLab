@@ -186,7 +186,7 @@ jellyseerr:
 
 # Prowlarr - Indexer manager
 prowlarr:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -215,7 +215,7 @@ prowlarr:
 
 # Flaresolverr - Cloudflare solver
 flaresolverr:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -235,7 +235,7 @@ flaresolverr:
 
 # Transmission with OpenVPN
 transmission-openvpn:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
