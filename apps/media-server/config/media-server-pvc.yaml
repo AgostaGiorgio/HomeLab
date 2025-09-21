@@ -11,6 +11,7 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
   hostPath:
     path: /mnt/ssd1/media-server
     type: DirectoryOrCreate
@@ -28,3 +29,4 @@ spec:
     requests:
       storage: 500Gi
   volumeName: media-server-pv
+  storageClassName: ""
