@@ -130,7 +130,7 @@ sonarr:
     host: sonarr.agogi.dev
     tls:
       enabled: true
-      secretName: sonar-tls-secret
+      secretName: sonarr-tls-secret
   
   persistence:
     media:
