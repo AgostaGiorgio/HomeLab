@@ -36,7 +36,7 @@ jellyfin:
     tls:
       - hosts:
           - jellyfin.agogi.dev
-        secretName: media-server-tls-secret
+        secretName: jellyfin-tls-secret
   
   persistence:
     media:
@@ -84,7 +84,7 @@ radarr:
     host: radarr.agogi.dev
     tls:
       enabled: true
-      secretName: media-server-tls-secret
+      secretName: radarr-tls-secret
   
   persistence:
     media:
@@ -130,7 +130,7 @@ sonarr:
     host: sonarr.agogi.dev
     tls:
       enabled: true
-      secretName: media-server-tls-secret
+      secretName: sonar-tls-secret
   
   persistence:
     media:
@@ -168,7 +168,7 @@ jellyseerr:
     host: jellyseerr.agogi.dev
     tls:
       enabled: true
-      secretName: media-server-tls-secret
+      secretName: jellyseerr-tls-secret
   
   env:
     PUID: "1000"
@@ -205,7 +205,7 @@ prowlarr:
     host: prowlarr.agogi.dev
     tls:
       enabled: true
-      secretName: media-server-tls-secret
+      secretName: prowlarr-tls-secret
   
   env:
     PUID: "1000"
@@ -259,7 +259,7 @@ transmission-openvpn:
     host: transmission.agogi.dev
     tls:
       enabled: true
-      secretName: media-server-tls-secret
+      secretName: transmission-tls-secret
 
   persistence:
     enabled: true

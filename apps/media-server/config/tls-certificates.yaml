@@ -3,16 +3,81 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: media-server-tls-secret
+  name: jellyfin-tls-secret
 spec:
-  secretName: media-server-tls-secret
+  secretName: jellyfin-tls-secret
   issuerRef:
     name: cloudflare-production-cluster-issuer
     kind: ClusterIssuer
   dnsNames:
   - jellyfin.agogi.dev
+
+---
+# Media-Server Certificates
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: radarr-tls-secret
+spec:
+  secretName: radarr-tls-secret
+  issuerRef:
+    name: cloudflare-production-cluster-issuer
+    kind: ClusterIssuer
+  dnsNames:
   - radarr.agogi.dev
+
+---
+# Media-Server Certificates
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: sonarr-tls-secret
+spec:
+  secretName: sonarr-tls-secret
+  issuerRef:
+    name: cloudflare-production-cluster-issuer
+    kind: ClusterIssuer
+  dnsNames:
   - sonarr.agogi.dev
+
+---
+# Media-Server Certificates
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: jellyseerr-tls-secret
+spec:
+  secretName: jellyseerr-tls-secret
+  issuerRef:
+    name: cloudflare-production-cluster-issuer
+    kind: ClusterIssuer
+  dnsNames:
   - jellyseerr.agogi.dev
+
+---
+# Media-Server Certificates
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: prowlarr-tls-secret
+spec:
+  secretName: prowlarr-tls-secret
+  issuerRef:
+    name: cloudflare-production-cluster-issuer
+    kind: ClusterIssuer
+  dnsNames:
   - prowlarr.agogi.dev
+
+---
+# Media-Server Certificates
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: transmission-tls-secret
+spec:
+  secretName: transmission-tls-secret
+  issuerRef:
+    name: cloudflare-production-cluster-issuer
+    kind: ClusterIssuer
+  dnsNames:
   - transmission.agogi.dev
