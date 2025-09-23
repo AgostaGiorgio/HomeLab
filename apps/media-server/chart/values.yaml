@@ -236,14 +236,8 @@ flaresolverr:
 # Transmission with OpenVPN
 transmission-openvpn:
   enabled: true
-  nameOverride: ""
-  fullnameOverride: ""
-  replicaCount: 1
-
   image:
-    repository: haugene/transmission-openvpn
     tag: "latest"
-    pullPolicy: IfNotPresent
 
   env:
     CREATE_TUN_DEVICE: "false"
@@ -295,7 +289,6 @@ transmission-openvpn:
     credentials:
       create: false
       existingSecret: "nordvpn-secrets"
-      
     config:
       NORDVPN_COUNTRY: "NL"
       NORDVPN_CATEGORY: "legacy_p2p"
@@ -320,11 +313,11 @@ transmission-openvpn:
     TRANSMISSION_UMASK: "002"
 
   extraVolumes:
-    - name: media-server
+    - name: shared-media
       persistentVolumeClaim:
         claimName: media-server-pvc
 
   extraVolumeMounts:
-    - name: media-server
+    - name: shared-media
       mountPath: /downloads
       subPath: downloads
