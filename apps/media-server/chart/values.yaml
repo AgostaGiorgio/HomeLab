@@ -290,7 +290,7 @@ transmission-openvpn:
       create: false
       existingSecret: "nordvpn-secrets"
     config:
-      NORDVPN_COUNTRY: "NL"
+      NORDVPN_COUNTRY: "IT"
       NORDVPN_CATEGORY: "legacy_p2p"
       NORDVPN_PROTOCOL: "udp"
       OPENVPN_OPTS: "--inactive 3600 --ping 10 --ping-exit 60"
