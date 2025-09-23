@@ -240,7 +240,7 @@ transmission-openvpn:
     tag: "latest"
 
   env:
-    CREATE_TUN_DEVICE: "false"
+    CREATE_TUN_DEVICE: "true"
     TZ: "Asia/Dubai"
 
   ingress:
