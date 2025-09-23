@@ -321,3 +321,6 @@ transmission-openvpn:
     - name: shared-media
       mountPath: /downloads
       subPath: downloads
+
+  securityContext:
+    privileged: true
