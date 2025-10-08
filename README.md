@@ -113,7 +113,7 @@ ssh-keygen -t ed25519 -C "homelab@yourdomain.com"
 ### Step 2.3: Copy Public Key to Server
 ```bash
 # From Mac Mini - copy key to server
-ssh-copy-id username@192.168.1.30
+ssh-copy-id -i <path to key.pub> username@192.168.1.30
 
 # Test connection
 ssh username@192.168.1.30

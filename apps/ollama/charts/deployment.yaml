@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          ports:
+            - containerPort: 11434
+          env:
+            - name: OLLAMA_MODELS
+              value: /models
+          volumeMounts:
+            - mountPath: /models
+              name: model-storage
+          resources:
+            requests:
+              cpu: "4"
+              memory: "8Gi"
+            limits:
+              cpu: "12"
+              memory: "24Gi"
+          command: ["/bin/bash"]
+          args:
+            - "-c"
+            - |
+              ollama serve &
+              sleep 5
+              ollama pull llama3.1:8b-instruct-q4_K_M
+              wait
+      volumes:
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: ollama-pvc

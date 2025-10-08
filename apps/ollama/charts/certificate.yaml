@@ -1,0 +1,13 @@
+
+# Certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ollama-ingeress-cert
+spec:
+  secretName: ollama-cert-secret
+  issuerRef:
+    name: cloudflare-production-cluster-issuer
+    kind: ClusterIssuer
+  dnsNames:
+  - ollama.agogi.dev
