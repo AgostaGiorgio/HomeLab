@@ -7,7 +7,7 @@ global:
 
 # Jellyfin - Media server
 jellyfin:
-  enabled: true
+  enabled: false
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -60,7 +60,7 @@ jellyfin:
 
 # Radarr - Movie management
 radarr:
-  enabled: true
+  enabled: false
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -106,7 +106,7 @@ radarr:
 
 # Sonarr - TV show management
 sonarr:
-  enabled: true
+  enabled: false
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -144,7 +144,7 @@ sonarr:
 
 # Jellyseerr - Request management for Plex/Jellyfin
 jellyseerr:
-  enabled: true
+  enabled: false
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -186,7 +186,7 @@ jellyseerr:
 
 # Prowlarr - Indexer manager
 prowlarr:
-  enabled: true
+  enabled: false
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -215,7 +215,7 @@ prowlarr:
 
 # Flaresolverr - Cloudflare solver
 flaresolverr:
-  enabled: true
+  enabled: false
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -235,7 +235,7 @@ flaresolverr:
 
 # Transmission with OpenVPN
 transmission-openvpn:
-  enabled: true
+  enabled: false
   image:
     tag: "latest"
 
