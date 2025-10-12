@@ -7,7 +7,7 @@ global:
 
 # Jellyfin - Media server
 jellyfin:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -60,7 +60,7 @@ jellyfin:
 
 # Radarr - Movie management
 radarr:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -106,7 +106,7 @@ radarr:
 
 # Sonarr - TV show management
 sonarr:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -144,7 +144,7 @@ sonarr:
 
 # Jellyseerr - Request management for Plex/Jellyfin
 jellyseerr:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -186,7 +186,7 @@ jellyseerr:
 
 # Prowlarr - Indexer manager
 prowlarr:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -215,7 +215,7 @@ prowlarr:
 
 # Flaresolverr - Cloudflare solver
 flaresolverr:
-  enabled: false
+  enabled: true
   nameOverride: ""
   fullnameOverride: ""
   replicaCount: 1
@@ -233,15 +233,36 @@ flaresolverr:
     enabled: false
 
 
-# Transmission with OpenVPN
-transmission-openvpn:
-  enabled: false
-  image:
-    tag: "latest"
+qbittorrent:
+  enabled: true
+  replicaCount: 1
 
-  env:
-    CREATE_TUN_DEVICE: "false"
-    TZ: "Asia/Dubai"
+  image:
+    repository: lscr.io/linuxserver/qbittorrent
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    http:
+      port: 8080
+    torrent:
+      tcp: 6881
+      udp: 6881
+
+  persistence:
+    config:
+      enabled: true
+      existingClaim: media-server-pvc
+      mountPath: /config
+    downloads:
+      enabled: true
+      existingClaim: media-server-pvc
+      mountPath: /downloads
+    incomplete:
+      enabled: true
+      existingClaim: media-server-pvc
+      mountPath: /downloads/incomplete
 
   ingress:
     enabled: true
@@ -250,74 +271,7 @@ transmission-openvpn:
       cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
       traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
       traefik.ingress.kubernetes.io/router.tls: "true"
-    host: transmission.agogi.dev
+    host: qbittorrent.agogi.dev
     tls:
       enabled: true
-      secretName: transmission-tls-secret
-
-  persistence:
-    enabled: true
-    size: 10Gi
-
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-    requests:
-      cpu: 200m
-      memory: 256Mi
-
-  livenessProbe:
-    httpGet:
-      path: /transmission/web/
-      port: 9091
-    initialDelaySeconds: 60
-    periodSeconds: 30
-    timeoutSeconds: 10
-    failureThreshold: 3
-
-  readinessProbe:
-    tcpSocket:
-      port: 9091
-    initialDelaySeconds: 30
-    periodSeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 3
-
-  openvpn:
-    provider: "NORDVPN"
-    credentials:
-      create: false
-      existingSecret: "nordvpn-secrets"
-    config:
-      NORDVPN_COUNTRY: "IT"
-      NORDVPN_CATEGORY: "legacy_p2p"
-      NORDVPN_PROTOCOL: "udp"
-      OPENVPN_OPTS: "--inactive 3600 --ping 10 --ping-exit 60"
-
-  transmission:
-    settings:
-      TRANSMISSION_SPEED_LIMIT_UP: "2048"
-      TRANSMISSION_SPEED_LIMIT_DOWN: "8192"
-      TRANSMISSION_RATIO_LIMIT: "2"
-      TRANSMISSION_RATIO_LIMIT_ENABLED: "true"
-      TRANSMISSION_DOWNLOAD_DIR: "/downloads"
-      TRANSMISSION_INCOMPLETE_DIR: "/downloads/incomplete"
-      TRANSMISSION_WATCH_DIR: "/data/watch"
-      TRANSMISSION_RPC_AUTHENTICATION_REQUIRED: "false"
-      TRANSMISSION_RPC_HOST_WHITELIST_ENABLED: "false"
-      TRANSMISSION_RPC_URL: "/transmission/"
-
-  extraEnv:
-    LOCAL_NETWORK: "192.168.0.0/16,10.0.0.0/8,172.16.0.0/12"
-    TRANSMISSION_UMASK: "002"
-
-  extraVolumes:
-    - name: shared-media
-      persistentVolumeClaim:
-        claimName: media-server-pvc
-
-  extraVolumeMounts:
-    - name: shared-media
-      mountPath: /downloads
-      subPath: downloads
+      secretName: qbittorrent-tls-secret

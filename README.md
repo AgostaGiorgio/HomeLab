@@ -10,9 +10,9 @@ A comprehensive guide to deploy a complete Kubernetes-based HomeLab using k3s, A
 ├─────────────────────────────────────────────────────────────────┤
 │  Mac Mini (Client)                                              │
 │  ├─ kubectl (local access)                                      │
-│  └─ SSH access (192.168.1.30)                                   │
+│  └─ SSH access (192.168.8.130)                                   │
 │                                                                 │
-│  Ubuntu Server (192.168.1.30)                                   │
+│  Ubuntu Server (192.168.8.130)                                   │
 │  ├─ SSH Server (key-based auth)                                 │
 │  ├─ Tailscale VPN (100.x.x.x)                                   │
 │  ├─ k3s Kubernetes                                              │
@@ -25,7 +25,7 @@ A comprehensive guide to deploy a complete Kubernetes-based HomeLab using k3s, A
 │  Remote Access                                                  │
 │  ├─ Mobile devices (via Tailscale)                              │
 │  ├─ External computers (via Tailscale)                          │
-│  └─ Domain routing (*.yourdomain.com → 192.168.1.30)            │
+│  └─ Domain routing (*.yourdomain.com → 192.168.8.130)            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -33,7 +33,7 @@ A comprehensive guide to deploy a complete Kubernetes-based HomeLab using k3s, A
 
 Before starting, ensure you have:
 
-- Ubuntu Server (20.04+ recommended) with static IP (192.168.1.30)
+- Ubuntu Server (20.04+ recommended) with static IP (192.168.8.130)
 - Mac Mini or client machine for management
 - Router with DHCP reservation capability
 - Domain name (optional, for external access)
@@ -61,11 +61,11 @@ Before starting, ensure you have:
 **Option A: Router DHCP Reservation (Recommended)**
 1. Access your router's admin interface
 2. Find DHCP reservations or static IP settings
-3. Assign `192.168.1.30` to your server's MAC address
+3. Assign `192.168.8.130` to your server's MAC address
 
 **Option B: Ubuntu Netplan Configuration**
 ```bash
-sudo nano /etc/netplan/00-installer-config.yaml
+sudo vi /etc/netplan/00-installer-config.yaml
 ```
 
 ```yaml
@@ -74,7 +74,7 @@ network:
   ethernets:
     enp0s3:  # Replace with your interface name
       dhcp4: false
-      addresses: [192.168.1.30/24]
+      addresses: [192.168.8.130/24]
       gateway4: 192.168.1.1
       nameservers:
         addresses: [1.1.1.1, 8.8.8.8]
@@ -113,10 +113,10 @@ ssh-keygen -t ed25519 -C "homelab@yourdomain.com"
 ### Step 2.3: Copy Public Key to Server
 ```bash
 # From Mac Mini - copy key to server
-ssh-copy-id -i <path to key.pub> username@192.168.1.30
+ssh-copy-id -i <path to key.pub> username@192.168.8.130
 
 # Test connection
-ssh username@192.168.1.30
+ssh username@192.168.8.130
 ```
 
 ### Step 2.4: Secure SSH Configuration
@@ -145,12 +145,12 @@ sudo systemctl restart ssh
 
 ### Step 2.5: Set Up SSH Config (on Mac Mini)
 ```bash
-nano ~/.ssh/config
+vi ~/.ssh/config
 ```
 
 ```bash
 Host homelab
-    HostName 192.168.1.30
+    HostName 192.168.8.130
     User your_username
     IdentityFile ~/.ssh/id_ed25519
     Port 22
@@ -176,7 +176,7 @@ curl -fsSL https://tailscale.com/install.sh | sh
 
 ### Step 3.2: Connect to Tailscale Network
 ```bash
-sudo tailscale up --advertise-routes=192.168.1.0/24
+sudo tailscale up --advertise-routes=192.168.8.0/24
 ```
 
 **Important**: This command outputs a URL. Open it in a browser to:
@@ -202,7 +202,7 @@ If you have a domain, set up a wildcard DNS record:
 **Cloudflare Example:**
 - Type: `A`
 - Name: `*` (wildcard)
-- Target: `192.168.1.30` (your server's local IP)
+- Target: `192.168.8.130` (your server's local IP)
 - **Important**: Disable proxy/orange cloud (DNS only)
 
 This allows `*.yourdomain.com` to resolve to your server when on your local network.
@@ -243,7 +243,7 @@ Add this configuration:
 ```ini
 [Service]
 ExecStart=
-ExecStart=/usr/local/bin/k3s server --bind-address=0.0.0.0 --tls-san=192.168.1.30 --tls-san=$TAILSCALE_IP --write-kubeconfig-mode=644 --disable=traefik
+ExecStart=/usr/local/bin/k3s server --bind-address=0.0.0.0 --tls-san=192.168.8.130 --tls-san=$TAILSCALE_IP --write-kubeconfig-mode=644 --disable=traefik
 ```
 
 Apply changes:
@@ -265,7 +265,7 @@ sed -i 's/server: https:\/\/0.0.0.0:6443/server: https:\/\/127.0.0.1:6443/' ~/.k
 scp homelab:/etc/rancher/k3s/k3s.yaml ~/.kube/homelab-config
 
 # Fix server address for remote access
-sed -i '' 's/127.0.0.1/192.168.1.30/' ~/.kube/homelab-config
+sed -i '' 's/127.0.0.1/192.168.8.130/' ~/.kube/homelab-config
 
 # Test connection
 KUBECONFIG=~/.kube/homelab-config kubectl get nodes
@@ -318,7 +318,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 ```
 
 ### Step 5.5: Access ArgoCD UI
-- **Local access**: http://192.168.1.30:30080
+- **Local access**: http://192.168.8.130:30080
 - **Remote access**: http://100.x.x.x:30080 (via Tailscale)
 
 **Login with:**
@@ -348,7 +348,7 @@ This deploys the main infrastructure application that manages:
 - **Traefik**: Ingress controller with load balancing
 
 ### Step 6.2: Verify Deployment in ArgoCD UI
-1. Open ArgoCD UI (http://192.168.1.30:30080)
+1. Open ArgoCD UI (http://192.168.8.130:30080)
 2. You should see the "infra" application
 3. Click on it to see the child applications:
    - `cert-manager`
@@ -465,7 +465,7 @@ kubectl apply -f test/
 ```
 
 ### Step 8.4: Access Tests
-- **Local**: http://test.yourdomain.com (should resolve to 192.168.1.30)
+- **Local**: http://test.yourdomain.com (should resolve to 192.168.8.130)
 - **Remote**: http://test.yourdomain.com (via Tailscale routing)
 
 ---
@@ -511,7 +511,7 @@ kubectl get challenges -A
 #### Network Connectivity Issues
 ```bash
 # Test local access
-curl -I http://192.168.1.30:30080
+curl -I http://192.168.8.130:30080
 
 # Test Tailscale connectivity
 tailscale ping homelab-server

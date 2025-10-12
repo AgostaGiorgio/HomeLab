@@ -1,0 +1,65 @@
+replicaCount: 1
+
+image:
+  repository: lscr.io/linuxserver/qbittorrent
+  tag: latest
+  pullPolicy: IfNotPresent
+
+env:
+  PUID: "1000"
+  PGID: "1000"
+  TZ: "UTC"
+  WEBUI_PORT: "8080"
+
+service:
+  type: ClusterIP
+  http:
+    port: 8080
+  torrent:
+    tcp: 6881
+    udp: 6881
+
+persistence:
+  config:
+    enabled: true
+    existingClaim: ""
+    mountPath: /config
+  downloads:
+    enabled: true
+    existingClaim: ""
+    mountPath: /downloads
+  incomplete:
+    enabled: true
+    existingClaim: ""
+    mountPath: /downloads/incomplete
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  host: ""
+  tls:
+    enabled: false
+    secretName: ""
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "2Gi"
+    cpu: "2000m"
+
+probes:
+  liveness:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3

@@ -30,7 +30,7 @@ dependencies:
     version: 1.0.0
     repository: https://helms.cubancodelab.net/
     condition: flaresolverr.enabled
-  - name: transmission-openvpn
-    version: 0.1.0
-    repository: https://helms.cubancodelab.net/
-    condition: transmission-openvpn.enabled
+  - name: qbittorrent
+    version: 1.0.0
+    repository: "file://../../../charts/qbittorrent"
+    condition: qbittorrent.enabled
