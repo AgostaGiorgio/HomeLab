@@ -36,18 +36,15 @@ spec:
           value: {{ $value | quote }}
         {{- end }}
         volumeMounts:
-        {{- if .Values.persistence.config.enabled }}
-        - name: config
-          mountPath: {{ .Values.persistence.config.mountPath }}
-        {{- end }}
-        {{- if .Values.persistence.downloads.enabled }}
-        - name: downloads
-          mountPath: {{ .Values.persistence.downloads.mountPath }}
-        {{- end }}
-        {{- if .Values.persistence.incomplete.enabled }}
-        - name: incomplete
-          mountPath: {{ .Values.persistence.incomplete.mountPath }}
-        {{- end }}
+        - name: media
+          mountPath: /config
+          subPath: config
+        - name: media
+          mountPath: /downloads
+          subPath: downloads
+        - name: media
+          mountPath: /downloads/incomplete
+          subPath: downloads/incomplete
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         {{- if .Values.probes.liveness.enabled }}
@@ -71,18 +68,6 @@ spec:
           failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
         {{- end }}
       volumes:
-      {{- if .Values.persistence.config.enabled }}
-      - name: config
+      - name: media
         persistentVolumeClaim:
-          claimName: {{ .Values.persistence.config.existingClaim }}
-      {{- end }}
-      {{- if .Values.persistence.downloads.enabled }}
-      - name: downloads
-        persistentVolumeClaim:
-          claimName: {{ .Values.persistence.downloads.existingClaim }}
-      {{- end }}
-      {{- if .Values.persistence.incomplete.enabled }}
-      - name: incomplete
-        persistentVolumeClaim:
-          claimName: {{ .Values.persistence.incomplete.existingClaim }}
-      {{- end }}
+          claimName: {{ .Values.persistence.existingClaim }}

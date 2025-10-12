@@ -251,18 +251,7 @@ qbittorrent:
       udp: 6881
 
   persistence:
-    config:
-      enabled: true
-      existingClaim: media-server-pvc
-      mountPath: /config
-    downloads:
-      enabled: true
-      existingClaim: media-server-pvc
-      mountPath: /downloads
-    incomplete:
-      enabled: true
-      existingClaim: media-server-pvc
-      mountPath: /downloads/incomplete
+    existingClaim: media-server-pvc
 
   ingress:
     enabled: true
