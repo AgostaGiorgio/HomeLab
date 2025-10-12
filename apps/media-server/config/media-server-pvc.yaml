@@ -28,5 +28,5 @@ spec:
   resources:
     requests:
       storage: 500Gi
-  volumeName: media-server-pvc
+  volumeName: media-server-pv
   storageClassName: ""
