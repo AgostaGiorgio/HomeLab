@@ -38,7 +38,7 @@ spec:
         volumeMounts:
         {{- if .Values.persistence.config.enabled }}
         - name: config
-          mountPath: /config
+          mountPath: {{ .Values.persistence.config.mountPath }}
         {{- end }}
         {{- if .Values.persistence.downloads.enabled }}
         - name: downloads
