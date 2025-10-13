@@ -67,17 +67,3 @@ spec:
     kind: ClusterIssuer
   dnsNames:
   - prowlarr.agogi.dev
-
----
-# Media-Server Certificates
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: transmission-tls-secret
-spec:
-  secretName: transmission-tls-secret
-  issuerRef:
-    name: cloudflare-production-cluster-issuer
-    kind: ClusterIssuer
-  dnsNames:
-  - transmission.agogi.dev
