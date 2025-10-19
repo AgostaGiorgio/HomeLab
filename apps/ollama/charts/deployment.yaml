@@ -37,7 +37,7 @@ spec:
             - |
               ollama serve &
               sleep 5
-              ollama pull llama3.1:8b-instruct-q4_K_M
+              ollama pull qwen2.5:14b-instruct-q4_K_M
               wait
       volumes:
         - name: model-storage
