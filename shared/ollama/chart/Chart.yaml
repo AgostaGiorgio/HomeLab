@@ -9,4 +9,4 @@ dependencies:
   - name: ollama
     version: 1.0.0
     repository: "file://../../../charts/ollama"
-    condition: enabled
+    condition: ollama.enabled

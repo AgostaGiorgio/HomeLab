@@ -1,37 +1,38 @@
-enabed: false
+ollama:  
+  enabed: false
 
-image:
-  repository: ollama/ollama
-  tag: latest
-  pullPolicy: IfNotPresent
+  image:
+    repository: ollama/ollama
+    tag: latest
+    pullPolicy: IfNotPresent
 
-replicaCount: 1
+  replicaCount: 1
 
-models:
-  path: /models
-  pull:
-    - llama3.2:3b-instruct-q4_K_M
+  models:
+    path: /models
+    pull:
+      - llama3.2:3b-instruct-q4_K_M
 
-storage:
-  enabled: true
-  createPV: true
-  storageClassName: "local-ssd"
-  size: 100Gi
-  hostPath: /mnt/ssd1/models
-
-service:
-  type: ClusterIP
-  port: 11434
-  targetPort: 11434
-
-ingress:
-  enabled: true
-  className: traefik
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
-  host: ollama.agogi.dev
-  tls:
+  storage:
     enabled: true
-    secretName: ollama-cert-secret
+    createPV: true
+    storageClassName: "local-ssd"
+    size: 100Gi
+    hostPath: /mnt/ssd1/models
+
+  service:
+    type: ClusterIP
+    port: 11434
+    targetPort: 11434
+
+  ingress:
+    enabled: true
+    className: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+    host: ollama.agogi.dev
+    tls:
+      enabled: true
+      secretName: ollama-cert-secret
