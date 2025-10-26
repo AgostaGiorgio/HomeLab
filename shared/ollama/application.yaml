@@ -12,7 +12,7 @@ spec:
   sources:
     - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
       targetRevision: master
-      path: shared/ollama
+      path: shared/ollama/chart
       helm:
         valueFiles:
           - values.yaml
