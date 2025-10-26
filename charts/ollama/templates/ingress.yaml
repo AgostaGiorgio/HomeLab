@@ -27,5 +27,5 @@ spec:
           service:
             name: {{ include "ollama.fullname" . }}
             port:
-              number: {{ .Values.service.http.port }}
+              number: {{ .Values.service.port }}
 {{- end }}
