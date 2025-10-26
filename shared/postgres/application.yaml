@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ollama
+  name: postgres
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -12,13 +12,19 @@ spec:
   sources:
     - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
       targetRevision: master
-      path: shared/ollama
+      path: shared/postgres/config
+      directory:
+        include: "*.yaml"
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: postgresql
+      targetRevision: 15.2.0 # stable Bitnami chart version
       helm:
+        releaseName: postgres
         valueFiles:
           - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: ollama
+    namespace: postgres
   syncPolicy:
     automated:
       prune: true

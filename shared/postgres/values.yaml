@@ -1,0 +1,25 @@
+auth:
+  existingSecret: postgres-secrets
+  username: admin
+  database: postgres
+  secretKeys:
+    adminPasswordKey: postgres-password
+    userPasswordKey: password
+
+primary:
+  persistence:
+    enabled: true
+    existingClaim: postgres-pvc
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+
+volumePermissions:
+  enabled: true
+
+service:
+  type: NodePort
+  nodePorts:
+    postgresql: 35432
+  port: 5432
