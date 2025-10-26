@@ -67,19 +67,7 @@ storage:
 
 # Service configuration
 service:
-  type: ClusterIP
+  type: ClusterIP #Or NodePort
   port: 11434
   targetPort: 11434
-
-# Ingress configuration
-ingress:
-  enabled: false
-  className: traefik
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    cert-manager.io/cluster-issuer: ""
-  host: ""
-  tls:
-    enabled: false
-    secretName: ollama-cert-secret
+  #nodePort: 30434

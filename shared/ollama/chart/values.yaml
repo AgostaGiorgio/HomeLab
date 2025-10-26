@@ -21,18 +21,6 @@ ollama:
     hostPath: /mnt/ssd1/models
 
   service:
-    type: ClusterIP
+    type: NodePort
     port: 11434
-    targetPort: 11434
-
-  ingress:
-    enabled: true
-    className: traefik
-    annotations:
-      traefik.ingress.kubernetes.io/router.entrypoints: websecure
-      traefik.ingress.kubernetes.io/router.tls: "true"
-      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
-    host: ollama.agogi.dev
-    tls:
-      enabled: true
-      secretName: ollama-cert-secret
+    nodePort: 30434
