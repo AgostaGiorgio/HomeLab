@@ -24,7 +24,7 @@ resources:
 # Model configuration
 models:
   # Directory where models will be stored
-  path: /models
+  path: /ollama/models
   # Models to pull on startup (array format)
   pull:
     - llama3.2:3b-instruct-q4_K_M
@@ -44,7 +44,7 @@ storage:
   # Reclaim policy for PV (Retain, Delete, Recycle)
   reclaimPolicy: Retain
   # Host path for local storage (only used if createPV is true)
-  hostPath: /mnt/ssd1/models
+  hostPath: /mnt/ssd1/ollama/models
   # Host path type (optional: Directory, DirectoryOrCreate, File, Socket, CharDevice, BlockDevice)
   hostPathType: ""
   # NFS configuration (alternative to hostPath)

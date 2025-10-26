@@ -9,7 +9,7 @@ ollama:
   replicaCount: 1
 
   models:
-    path: /models
+    path: /ollama/models
     pull:
       - llama3.2:3b-instruct-q4_K_M
 
@@ -18,7 +18,7 @@ ollama:
     createPV: true
     storageClassName: "local-ssd"
     size: 100Gi
-    hostPath: /mnt/ssd1/models
+    hostPath: /mnt/ssd1/ollama/models
 
   service:
     type: NodePort
