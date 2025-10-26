@@ -1,3 +1,5 @@
+enabed: false
+
 image:
   repository: ollama/ollama
   tag: latest
