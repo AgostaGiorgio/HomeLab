@@ -1,0 +1,85 @@
+# Ollama Configuration
+
+# Name overrides
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: ollama/ollama
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Replica count
+replicaCount: 1
+
+# Resources configuration
+resources:
+  requests:
+    cpu: "4"
+    memory: "8Gi"
+  limits:
+    cpu: "12"
+    memory: "24Gi"
+
+# Model configuration
+models:
+  # Directory where models will be stored
+  path: /models
+  # Models to pull on startup (array format)
+  pull:
+    - llama3.2:3b-instruct-q4_K_M
+
+# Storage configuration
+storage:
+  # Enable persistent volume
+  enabled: false
+  # Create PersistentVolume (set to false if PV already exists or using dynamic provisioning)
+  createPV: false
+  # Storage class name
+  storageClassName: "local-ssd"
+  # Storage size
+  size: 100Gi
+  # Access mode
+  accessMode: ReadWriteOnce
+  # Reclaim policy for PV (Retain, Delete, Recycle)
+  reclaimPolicy: Retain
+  # Host path for local storage (only used if createPV is true)
+  hostPath: /mnt/ssd1/models
+  # Host path type (optional: Directory, DirectoryOrCreate, File, Socket, CharDevice, BlockDevice)
+  hostPathType: ""
+  # NFS configuration (alternative to hostPath)
+  nfs:
+    enabled: false
+    server: ""
+    path: ""
+    readOnly: false
+  # Node affinity for PV (useful for local volumes to bind to specific nodes)
+  nodeAffinity: {}
+    # required:
+    #   nodeSelectorTerms:
+    #   - matchExpressions:
+    #     - key: kubernetes.io/hostname
+    #       operator: In
+    #       values:
+    #       - node-name
+  # Existing PVC name (if you want to use an existing PVC, set createPV to false)
+  existingClaim: ""
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 11434
+  targetPort: 11434
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: ""
+  host: ""
+  tls:
+    enabled: false
+    secretName: ollama-cert-secret

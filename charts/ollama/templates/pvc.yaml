@@ -1,0 +1,50 @@
+{{- if and .Values.storage.enabled .Values.storage.createPV (not .Values.storage.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "ollama.fullname" . }}-pv
+  labels:
+    {{- include "ollama.labels" . | nindent 4 }}
+spec:
+  capacity:
+    storage: {{ .Values.storage.size }}
+  accessModes:
+    - {{ .Values.storage.accessMode }}
+  persistentVolumeReclaimPolicy: {{ .Values.storage.reclaimPolicy }}
+  storageClassName: {{ .Values.storage.storageClassName }}
+  {{- if .Values.storage.hostPath }}
+  hostPath:
+    path: {{ .Values.storage.hostPath }}
+    {{- if .Values.storage.hostPathType }}
+    type: {{ .Values.storage.hostPathType }}
+    {{- end }}
+  {{- else if .Values.storage.nfs }}
+  nfs:
+    server: {{ .Values.storage.nfs.server }}
+    path: {{ .Values.storage.nfs.path }}
+    {{- if .Values.storage.nfs.readOnly }}
+    readOnly: {{ .Values.storage.nfs.readOnly }}
+    {{- end }}
+  {{- end }}
+  {{- with .Values.storage.nodeAffinity }}
+  nodeAffinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+---
+{{- if and .Values.storage.enabled (not .Values.storage.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "ollama.fullname" . }}-pvc
+  labels:
+    {{- include "ollama.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.storage.accessMode }}
+  storageClassName: {{ .Values.storage.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.size }}
+  volumeName: {{ include "ollama.fullname" . }}-pv
+{{- end }}

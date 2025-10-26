@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ollama.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "ollama.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ollama.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ollama.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: ollama
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+              name: http
+              protocol: TCP
+          env:
+            - name: OLLAMA_MODELS
+              value: {{ .Values.models.path }}
+          volumeMounts:
+            - mountPath: {{ .Values.models.path }}
+              name: model-storage
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          command: ["/bin/bash"]
+          args:
+            - "-c"
+            - |
+              ollama serve &
+              sleep 5
+              {{- range .Values.models.pull }}
+              ollama pull {{ . }}
+              {{- end }}
+              wait
+      volumes:
+        - name: model-storage
+          {{- if .Values.storage.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.storage.existingClaim }}
+          {{- else if .Values.storage.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "ollama.fullname" . }}-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
