@@ -1,5 +1,5 @@
 ollama:  
-  enabed: false
+  enabed: true
 
   image:
     repository: ollama/ollama
