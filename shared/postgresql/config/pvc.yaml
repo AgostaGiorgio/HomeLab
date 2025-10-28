@@ -20,7 +20,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: postgresql
+  namespace: postgres
 spec:
   accessModes:
     - ReadWriteOnce
