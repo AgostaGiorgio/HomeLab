@@ -15,10 +15,11 @@ spec:
       path: shared/postgres/config
       directory:
         include: "*.yaml"
-    - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
-      targetRevision: master
-      path: shared/postgres
+    - chart: postgresql
+      repoURL: https://charts.bitnami.com/bitnami
+      targetRevision: 15.5.32
       helm:
+        releaseName: postgresql
         valueFiles:
           - values.yaml
   destination:
