@@ -16,4 +16,5 @@ postgresql:
 
   service:
     type: NodePort
+    port: 5432
     nodePort: 30432

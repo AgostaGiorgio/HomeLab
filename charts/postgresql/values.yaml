@@ -51,9 +51,9 @@ postgresql:
 # Service Configuration
 service:
   # type: ClusterIP
-  # port: 5432
   # Uncomment for NodePort access
   type: NodePort
+  port: 5432
   nodePort: 30432
 
 # Optional: Init scripts (runs on first initialization)
