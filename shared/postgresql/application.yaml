@@ -23,7 +23,7 @@ spec:
           - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: postgresql
+    namespace: postgres
   syncPolicy:
     automated:
       prune: true
