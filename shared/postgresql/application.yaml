@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: postgres
+  name: postgresql
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -12,19 +12,13 @@ spec:
   sources:
     - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
       targetRevision: master
-      path: shared/postgres/config
-      directory:
-        include: "*.yaml"
-    - chart: postgresql
-      repoURL: https://charts.bitnami.com/bitnami
-      targetRevision: 15.5.32
+      path: shared/postgresql
       helm:
-        releaseName: postgresql
         valueFiles:
           - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: postgres
+    namespace: postgresql
   syncPolicy:
     automated:
       prune: true

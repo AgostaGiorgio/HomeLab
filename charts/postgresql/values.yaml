@@ -1,0 +1,89 @@
+# PostgreSQL 15 Custom Chart Configuration
+
+# PostgreSQL Configuration
+postgresql:
+  image:
+    registry: docker.io
+    repository: postgres
+    tag: "15"
+    pullPolicy: IfNotPresent
+
+  # Database configuration
+  auth:
+    # Reference to your existing SealedSecret
+    existingSecret: "postgres-secrets"
+    postgresPasswordKey: "postgres-password"
+    passwordKey: "password"
+    username: "appuser"
+    database: "myapp"
+
+  # Persistence using your existing PVC
+  persistence:
+    enabled: true
+    existingClaim: "postgres-pvc"
+    mountPath: /var/lib/postgresql/data
+    subPath: "pgdata"
+
+  # Resource limits
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  # PostgreSQL configuration
+  config:
+    max_connections: "200"
+    shared_buffers: "128MB"
+    effective_cache_size: "512MB"
+    maintenance_work_mem: "64MB"
+    checkpoint_completion_target: "0.9"
+    wal_buffers: "16MB"
+    default_statistics_target: "100"
+    random_page_cost: "1.1"
+    effective_io_concurrency: "200"
+    work_mem: "655kB"
+    min_wal_size: "1GB"
+    max_wal_size: "4GB"
+
+# Service Configuration
+service:
+  # type: ClusterIP
+  # port: 5432
+  # Uncomment for NodePort access
+  type: NodePort
+  nodePort: 30432
+
+# Optional: Init scripts (runs on first initialization)
+# postgresql:
+#   initdbScripts:
+#     01-init.sql: |
+#       CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+#       CREATE SCHEMA IF NOT EXISTS myschema;
+#       GRANT ALL ON SCHEMA myschema TO appuser;
+#     02-data.sql: |
+#       CREATE TABLE myschema.users (
+#         id SERIAL PRIMARY KEY,
+#         username VARCHAR(50) UNIQUE NOT NULL
+#       );
+
+# Optional: Node affinity
+# nodeSelector:
+#   kubernetes.io/hostname: "your-node-name"
+
+# Health checks
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
