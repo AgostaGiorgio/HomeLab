@@ -35,9 +35,8 @@ postgresql:
       subPath: "pgadmin" 
 
     service:
-      type: NodePort
+      type: ClusterIP
       port: 80
-      nodePort: 30080
 
     ingress:
       enabled: true

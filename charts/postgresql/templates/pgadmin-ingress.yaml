@@ -27,5 +27,5 @@ spec:
           service:
             name: {{ include "postgres.fullname" . }}
             port:
-              number: {{ .Values.service.http.port }}
+              number: {{ .Values.pgadmin.service.port }}
 {{- end }}
