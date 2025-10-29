@@ -15,7 +15,7 @@ postgresql:
     postgresPasswordKey: "postgres-password"
     passwordKey: "password"
     username: "appuser"
-    database: "myapp"
+    database: "postgres"
 
   # Persistence using your existing PVC
   persistence:
