@@ -50,10 +50,10 @@ spec:
           httpGet:
             path: /misc/ping
             port: http
-          initialDelaySeconds: 10
+          initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
-          failureThreshold: 3
+          failureThreshold: 6
         resources:
           {{- toYaml .Values.pgadmin.resources | nindent 10 }}
         volumeMounts:
