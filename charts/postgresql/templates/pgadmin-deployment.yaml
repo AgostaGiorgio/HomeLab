@@ -1,0 +1,80 @@
+{{- if .Values.pgadmin.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "postgres.fullname" . }}-pgadmin
+  labels:
+    {{- include "postgres.labels" . | nindent 4 }}
+    app.kubernetes.io/component: pgadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "postgres.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: pgadmin
+  template:
+    metadata:
+      labels:
+        {{- include "postgres.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: pgadmin
+    spec:
+      containers:
+      - name: pgadmin
+        image: "{{ .Values.pgadmin.image.registry }}/{{ .Values.pgadmin.image.repository }}:{{ .Values.pgadmin.image.tag }}"
+        imagePullPolicy: {{ .Values.pgadmin.image.pullPolicy }}
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: {{ .Values.pgadmin.auth.email | quote }}
+        - name: PGADMIN_DEFAULT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.pgadmin.auth.existingSecret }}
+              key: {{ .Values.pgadmin.auth.passwordKey }}
+        - name: PGADMIN_CONFIG_SERVER_MODE
+          value: "False"
+        - name: PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED
+          value: "False"
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /misc/ping
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          httpGet:
+            path: /misc/ping
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          {{- toYaml .Values.pgadmin.resources | nindent 10 }}
+        volumeMounts:
+        {{- if .Values.pgadmin.persistence.enabled }}
+        - name: pgadmin-data
+          mountPath: {{ .Values.pgadmin.persistence.mountPath }}
+          {{- if .Values.pgadmin.persistence.subPath }}
+          subPath: {{ .Values.pgadmin.persistence.subPath }}
+          {{- end }}
+        {{- end }}
+        - name: pgadmin-config
+          mountPath: /pgadmin4/servers.json
+          subPath: servers.json
+          readOnly: true
+      volumes:
+      {{- if .Values.pgadmin.persistence.enabled }}
+      - name: pgadmin-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.pgadmin.persistence.existingClaim }}
+      {{- end }}
+      - name: pgadmin-config
+        configMap:
+          name: {{ include "postgres.fullname" . }}-pgadmin-config
+{{- end }}

@@ -18,3 +18,35 @@ postgresql:
     type: NodePort
     port: 5432
     nodePort: 30432
+
+  pgadmin:
+    enabled: true
+    
+    image:
+      registry: docker.io
+      repository: dpage/pgadmin4
+      tag: "latest"
+      pullPolicy: IfNotPresent
+  
+    persistence:
+      enabled: true
+      existingClaim: "postgres-pvc"
+      mountPath: /var/lib/pgadmin
+      subPath: "pgadmin" 
+
+    service:
+      type: NodePort
+      port: 80
+      nodePort: 30080
+
+    ingress:
+      enabled: true
+      className: "traefik"
+      annotations:
+        cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+        traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+        traefik.ingress.kubernetes.io/router.tls: "true"
+      host: pgadmin.agogi.dev
+      tls:
+        enabled: true
+        secretName: pgadmin-tls-secret

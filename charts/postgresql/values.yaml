@@ -50,11 +50,55 @@ postgresql:
 
 # Service Configuration
 service:
-  # type: ClusterIP
-  # Uncomment for NodePort access
   type: NodePort
   port: 5432
   nodePort: 30432
+
+pgadmin:
+  enabled: false 
+  
+  image:
+    registry: docker.io
+    repository: dpage/pgadmin4
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  
+  auth:
+    email: "admin@agogi.dev"
+    existingSecret: "postgres-secrets"
+    passwordKey: "password"
+  
+  persistence:
+    enabled: true
+    existingClaim: "postgres-pvc"
+    mountPath: /var/lib/pgadmin
+    subPath: "pgadmin" 
+  
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+  ingress:
+    enabled: false
+    #className: "traefik"
+    #annotations:
+    #  cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+    #  traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+    #  traefik.ingress.kubernetes.io/router.tls: "true"
+    #host: pgadmin.hostname.com
+    tls:
+      enabled: false
+      #secretName: pgadmin-tls-secret
+  
+  # Service configuration
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 30080
 
 # Optional: Init scripts (runs on first initialization)
 # postgresql:

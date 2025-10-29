@@ -1,0 +1,25 @@
+{{- if .Values.pgadmin.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "postgres.fullname" . }}-pgadmin-config
+  labels:
+    {{- include "postgres.labels" . | nindent 4 }}
+    app.kubernetes.io/component: pgadmin
+data:
+  servers.json: |
+    {
+      "Servers": {
+        "1": {
+          "Name": "PostgreSQL Homelab",
+          "Group": "Servers",
+          "Host": "{{ include "postgres.fullname" . }}",
+          "Port": {{ .Values.service.port }},
+          "MaintenanceDB": "{{ .Values.postgresql.auth.database }}",
+          "Username": "{{ .Values.postgresql.auth.username }}",
+          "SSLMode": "prefer",
+          "PassFile": "/tmp/pgpassfile"
+        }
+      }
+    }
+{{- end }}

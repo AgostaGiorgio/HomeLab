@@ -1,0 +1,31 @@
+{{- if .Values.pgadmin.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "postgres.fullname" . }}
+  labels:
+    {{- include "postgres.labels" . | nindent 4 }}
+  {{- with .Values.pgadmin.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.pgadmin.ingress.className }}
+  {{- if .Values.pgadmin.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.pgadmin.ingress.host }}
+    secretName: {{ .Values.pgadmin.ingress.tls.secretName }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.pgadmin.ingress.host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "postgres.fullname" . }}
+            port:
+              number: {{ .Values.service.http.port }}
+{{- end }}
