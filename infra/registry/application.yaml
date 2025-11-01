@@ -12,17 +12,15 @@ spec:
   - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
     targetRevision: HEAD
     path: infra/registry/config
-  - repoURL: https://helm.mittwald.de
-    chart: registry-ui  
-    targetRevision: 1.0.0
-    helm:
-      valueFiles:
-      - $values/infra/registry/values-ui.yaml
   - repoURL: https://helm.twun.io
     chart: docker-registry
+    targetRevision: 2.2.2
     helm:
       valueFiles:
-      - $values/infra/registry/values-registry.yaml
+      - $values/infra/registry/values.yaml
+  - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
+    targetRevision: HEAD
+    path: infra/registry/ui
   destination:
     server: https://kubernetes.default.svc
     namespace: registry
@@ -30,3 +28,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

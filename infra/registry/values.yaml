@@ -1,0 +1,89 @@
+# values-registry.yaml for Docker Registry Helm Chart
+replicaCount: 1
+
+image:
+  repository: registry
+  tag: 2.8.3
+  pullPolicy: IfNotPresent
+
+service:
+  name: docker-registry
+  type: ClusterIP
+  port: 5000
+
+# Use your existing PVC
+persistence:
+  enabled: true
+  existingClaim: registry-pvc
+  accessMode: 'ReadWriteOnce'
+  size: 10Gi
+
+# Configure the registry with CORS and delete enabled
+configData:
+  version: 0.1
+  log:
+    fields:
+      service: registry
+  storage:
+    cache:
+      blobdescriptor: inmemory
+    filesystem:
+      rootdirectory: /var/lib/registry
+    delete:
+      enabled: true
+  http:
+    addr: :5000
+    headers:
+      X-Content-Type-Options: [nosniff]
+      Access-Control-Allow-Origin: ['*']
+      Access-Control-Allow-Methods: ['HEAD', 'GET', 'OPTIONS', 'DELETE']
+      Access-Control-Allow-Headers: ['Authorization', 'Accept', 'Cache-Control']
+      Access-Control-Max-Age: [1728000]
+      Access-Control-Allow-Credentials: [true]
+      Access-Control-Expose-Headers: ['Docker-Content-Digest']
+  auth:
+    htpasswd:
+      realm: basic-realm
+      path: /auth/htpasswd
+
+# Mount the secret for authentication
+secrets:
+  htpasswd: registry-secrets
+
+# Use existing secret
+extraVolumeMounts:
+  - name: auth
+    mountPath: /auth
+    readOnly: true
+
+extraVolumes:
+  - name: auth
+    secret:
+      secretName: registry-secrets
+      items:
+        - key: htpasswd
+          path: htpasswd
+
+# Ingress for direct registry access (docker push/pull)
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+        cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+        traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+        traefik.ingress.kubernetes.io/router.tls: "true"
+  hosts:
+    - registry.agogi.dev
+  path: /
+  tls:
+    - secretName: registry-tls
+      hosts:
+        - registry.agogi.dev
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
