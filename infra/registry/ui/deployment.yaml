@@ -22,8 +22,9 @@ spec:
         - containerPort: 80
           name: http
         env:
-        # Point to your registry service
-        - name: REGISTRY_URL
+        # Use nginx proxy pass instead of direct registry URL
+        # This avoids mixed content issues (HTTPS page -> HTTP registry)
+        - name: NGINX_PROXY_PASS_URL
           value: http://docker-registry:5000
         # Set to true for single registry mode
         - name: SINGLE_REGISTRY
