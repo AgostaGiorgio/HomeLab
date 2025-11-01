@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: registry-ui
+  namespace: argocd
+spec:
+  project: default
+  sources:
+  - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
+    targetRevision: HEAD
+    ref: values
+  - repoURL: git@github.com:AgostaGiorgio/HomeLab.git
+    targetRevision: HEAD
+    path: infra/registry/config
+  - repoURL: https://helm.mittwald.de
+    chart: registry-ui  
+    targetRevision: 1.0.0
+    helm:
+      valueFiles:
+      - $values/infra/registry/values-ui.yaml
+  - repoURL: https://helm.twun.io
+    chart: docker-registry
+    targetRevision: 2.2.2
+    helm:
+      valueFiles:
+      - $values/infra/registry/values-registry.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: registry
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
