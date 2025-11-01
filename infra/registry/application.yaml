@@ -20,7 +20,6 @@ spec:
       - $values/infra/registry/values-ui.yaml
   - repoURL: https://helm.twun.io
     chart: docker-registry
-    targetRevision: 2.2.2
     helm:
       valueFiles:
       - $values/infra/registry/values-registry.yaml
