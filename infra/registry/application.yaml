@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: registry-ui
+  name: docker-registry
   namespace: argocd
 spec:
   project: default
