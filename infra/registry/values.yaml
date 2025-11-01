@@ -47,31 +47,18 @@ configData:
       path: /auth/htpasswd
 
 # Mount the secret for authentication
+# The chart will automatically create the auth volume and mount
 secrets:
   htpasswd: registry-secrets
-
-# Use existing secret
-extraVolumeMounts:
-  - name: auth
-    mountPath: /auth
-    readOnly: true
-
-extraVolumes:
-  - name: auth
-    secret:
-      secretName: registry-secrets
-      items:
-        - key: htpasswd
-          path: htpasswd
 
 # Ingress for direct registry access (docker push/pull)
 ingress:
   enabled: true
   className: traefik
   annotations:
-        cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
-        traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-        traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: registry-auth@kubernetescrd
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
     - registry.agogi.dev
   path: /
