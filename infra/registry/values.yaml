@@ -1,4 +1,5 @@
-# values-registry.yaml for Docker Registry Helm Chart
+# values-registry.yaml
+
 replicaCount: 1
 
 image:
@@ -16,21 +17,16 @@ persistence:
   enabled: true
   existingClaim: registry-pvc
   accessMode: ReadWriteOnce
-  size: 10Gi
+  size: 500Gi  # match your PV/PVC
 
 ## Authentication
-secrets:
-  existingSecret: registry-secrets
-
-## Mount the secret into a writable folder
-extraVolumes:
-  - name: auth
-    secret:
-      secretName: registry-secrets
-extraVolumeMounts:
-  - name: auth
-    mountPath: /auth
-    readOnly: true
+auth:
+  enabled: true
+  htpasswd:
+    existingSecret: registry-secrets
+    path: /auth/htpasswd
+  # Optional realm name
+  realm: basic-realm
 
 ## Registry configuration
 configData:
@@ -54,26 +50,10 @@ configData:
       Access-Control-Allow-Headers: ['Authorization', 'Accept', 'Cache-Control', 'Content-Type']
       Access-Control-Allow-Credentials: [true]
       Access-Control-Expose-Headers: ['Docker-Content-Digest']
-  auth:
-    htpasswd:
-      realm: basic-realm
-      path: /auth/htpasswd
 
 ## Ingress
 ingress:
-  enabled: true
-  className: traefik
-  annotations:
-    cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
-    traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-    traefik.ingress.kubernetes.io/router.tls: "true"
-  hosts:
-    - registry.agogi.dev
-  path: /
-  tls:
-    - secretName: registry-tls
-      hosts:
-        - registry.agogi.dev
+  enabled: false
 
 resources:
   requests:
