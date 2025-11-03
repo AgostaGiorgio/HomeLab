@@ -46,12 +46,9 @@ configData:
       realm: basic-realm
       path: /auth/htpasswd
 
-# Mount the secret for authentication
-# The chart will automatically create the auth volume and mount
 secrets:
-  htpasswd: registry-secrets
+  existingSecret: registry-secrets
 
-# Ingress for direct registry access (docker push/pull)
 ingress:
   enabled: true
   className: traefik
