@@ -22,7 +22,17 @@ persistence:
 secrets:
   existingSecret: registry-secrets
 
-## Docker Registry configuration
+## Mount the secret into a writable folder
+extraVolumes:
+  - name: auth
+    secret:
+      secretName: registry-secrets
+extraVolumeMounts:
+  - name: auth
+    mountPath: /auth
+    readOnly: true
+
+## Registry configuration
 configData:
   version: 0.1
   log:
@@ -47,8 +57,7 @@ configData:
   auth:
     htpasswd:
       realm: basic-realm
-      path: /etc/docker/registry/htpasswd
-
+      path: /auth/htpasswd
 
 ## Ingress
 ingress:
