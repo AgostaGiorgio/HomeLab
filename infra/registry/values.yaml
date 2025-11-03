@@ -11,14 +11,18 @@ service:
   type: ClusterIP
   port: 5000
 
-# Use your existing PVC
+## Storage
 persistence:
   enabled: true
   existingClaim: registry-pvc
-  accessMode: 'ReadWriteOnce'
+  accessMode: ReadWriteOnce
   size: 10Gi
 
-# Configure the registry with CORS and delete enabled
+## Authentication
+secrets:
+  existingSecret: registry-secrets
+
+## Docker Registry configuration
 configData:
   version: 0.1
   log:
@@ -36,19 +40,17 @@ configData:
     headers:
       X-Content-Type-Options: [nosniff]
       Access-Control-Allow-Origin: ['*']
-      Access-Control-Allow-Methods: ['HEAD', 'GET', 'OPTIONS', 'DELETE']
-      Access-Control-Allow-Headers: ['Authorization', 'Accept', 'Cache-Control']
-      Access-Control-Max-Age: [1728000]
+      Access-Control-Allow-Methods: ['HEAD', 'GET', 'OPTIONS', 'DELETE', 'PUT']
+      Access-Control-Allow-Headers: ['Authorization', 'Accept', 'Cache-Control', 'Content-Type']
       Access-Control-Allow-Credentials: [true]
       Access-Control-Expose-Headers: ['Docker-Content-Digest']
   auth:
     htpasswd:
       realm: basic-realm
-      path: /auth/htpasswd
+      path: /etc/docker/registry/htpasswd
 
-secrets:
-  existingSecret: registry-secrets
 
+## Ingress
 ingress:
   enabled: true
   className: traefik
