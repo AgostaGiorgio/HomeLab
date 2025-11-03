@@ -47,24 +47,11 @@ configData:
       path: /auth/htpasswd
 
 # Mount the secret for authentication
+# The chart will automatically create the auth volume and mount
 secrets:
-  htpasswd: ""
+  htpasswd: registry-secrets
 
-# Mount existing secret with htpasswd
-extraVolumeMounts:
-  - name: auth-secret
-    mountPath: /auth
-    readOnly: true
-
-extraVolumes:
-  - name: auth-secret
-    secret:
-      secretName: registry-secrets
-      items:
-        - key: htpasswd
-          path: htpasswd
-
-# Disable ingress - we'll use a single ingress for both UI and registry
+# Ingress for direct registry access (docker push/pull)
 ingress:
   enabled: true
   className: traefik
