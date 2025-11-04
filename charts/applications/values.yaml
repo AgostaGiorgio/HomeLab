@@ -1,0 +1,50 @@
+# --- App Name ---
+nameOverride: ""
+fullnameOverride: ""
+
+# --- Image ---
+image:
+  registry: docker.io
+  repository: myorg/myapp
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+# --- Service ---
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+# --- Ingress ---
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# --- Resources ---
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# --- Volumes ---
+volumes: []
+volumeMounts: []
+
+# --- Secrets as env ---
+envFromSecrets: []
+
+# --- Environment variables ---
+env: []

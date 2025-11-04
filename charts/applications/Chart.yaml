@@ -1,0 +1,6 @@
+apiVersion: v2
+name: base-application
+description: A generic Helm chart for internal Python/Java apps
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
