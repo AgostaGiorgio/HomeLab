@@ -38,20 +38,20 @@ mtrack:
       mountPath: /mnt/data
 
   envFromSecrets:
-    - name: postgres-secrets
+    - name: mtrack-secrets
 
   env:
     # Telegram
     - name: TELEGRAM_BOT_TOKEN
       valueFrom:
         secretKeyRef:
-          name: postgres-secrets
+          name: mtrack-secrets
           key: TELEGRAM_BOT_TOKEN
 
     - name: TELEGRAM_CHAT_ID
       valueFrom:
         secretKeyRef:
-          name: postgres-secrets
+          name: mtrack-secrets
           key: TELEGRAM_CHAT_ID
 
     # Voice/Whisper paths (use mounted PVC)
@@ -72,12 +72,12 @@ mtrack:
     - name: POSTGRES_USER
       valueFrom:
         secretKeyRef:
-          name: postgres-secrets
+          name: mtrack-secrets
           key: POSTGRES_USER
     - name: POSTGRES_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: postgres-secrets
+          name: mtrack-secrets
           key: POSTGRES_PASSWORD
     - name: POSTGRES_HOST
       value: postgresql.postgres.svc.cluster.local
