@@ -1,4 +1,5 @@
-mtrack:
+mtrack: 
+  enabled: true
   fullnameOverride: mtrack
 
 
