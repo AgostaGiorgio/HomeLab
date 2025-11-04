@@ -41,18 +41,18 @@ spec:
           {{- end }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
+          {{- if .Values.envFromSecrets }}
+          envFrom:
+            {{- range .Values.envFromSecrets }}
+            - secretRef:
+                name: {{ .name }}
+            {{- end }}
+          {{- end }}
+
+          {{- if .Values.env }}
           env:
-{{- if .Values.env }}
-{{ toYaml .Values.env | indent 12 }}
-{{- end }}
-{{- if .Values.envFromSecrets }}
-{{- range .Values.envFromSecrets }}
-            - name: {{ .name }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .name }}
-{{- end }}
-{{- end }}
+          {{ toYaml .Values.env | indent 2 }}
+          {{- end }}
           volumeMounts:
 {{- if .Values.volumeMounts }}
 {{ toYaml .Values.volumeMounts | indent 12 }}

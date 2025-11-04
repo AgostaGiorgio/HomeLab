@@ -41,19 +41,6 @@ mtrack:
     - name: mtrack-secrets
 
   env:
-    # Telegram
-    - name: TELEGRAM_BOT_TOKEN
-      valueFrom:
-        secretKeyRef:
-          name: mtrack-secrets
-          key: TELEGRAM_BOT_TOKEN
-
-    - name: TELEGRAM_CHAT_ID
-      valueFrom:
-        secretKeyRef:
-          name: mtrack-secrets
-          key: TELEGRAM_CHAT_ID
-
     # Voice/Whisper paths (use mounted PVC)
     - name: VOICE_RECORDING_DOWNLOAD_PATH
       value: /mnt/data/voices
@@ -69,16 +56,6 @@ mtrack:
       value: llama3.2:3b-instruct-q4_K_M
 
     # Postgres configuration
-    - name: POSTGRES_USER
-      valueFrom:
-        secretKeyRef:
-          name: mtrack-secrets
-          key: POSTGRES_USER
-    - name: POSTGRES_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mtrack-secrets
-          key: POSTGRES_PASSWORD
     - name: POSTGRES_HOST
       value: postgresql.postgres.svc.cluster.local
     - name: POSTGRES_PORT
