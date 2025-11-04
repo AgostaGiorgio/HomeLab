@@ -51,7 +51,7 @@ spec:
 
           {{- if .Values.env }}
           env:
-          {{ toYaml .Values.env | indent 2 }}
+          {{ toYaml .Values.env | indent 12 }}
           {{- end }}
           volumeMounts:
 {{- if .Values.volumeMounts }}
