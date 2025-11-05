@@ -7,7 +7,7 @@ mtrack:
     registry: registry.agogi.dev
     repository: mtrack
     tag: "1.0.0"
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
   replicaCount: 1
 
