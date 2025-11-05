@@ -15,49 +15,31 @@ spec:
         {{- include "application.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - name: app
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-          {{- range .Values.ports }}
-            - name: {{ .name }}
-              containerPort: {{ .containerPort }}
-          {{- end }}
-
-          {{- if .Values.probes.enabled }}
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.probes.liveness.path }}
-              port: {{ .Values.probes.liveness.port }}
-            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
-
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.probes.readiness.path }}
-              port: {{ .Values.probes.readiness.port }}
-            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
-          {{- end }}
-          resources:
-{{ toYaml .Values.resources | indent 12 }}
-          {{- if .Values.envFromSecrets }}
-          envFrom:
-            {{- range .Values.envFromSecrets }}
-            - secretRef:
-                name: {{ .name }}
-            {{- end }}
-          {{- end }}
-
-          {{- if .Values.env }}
-          env:
-          {{ toYaml .Values.env | indent 12 }}
-          {{- end }}
-          volumeMounts:
-{{- if .Values.volumeMounts }}
-{{ toYaml .Values.volumeMounts | indent 12 }}
-{{- end }}
+      - name: {{ include "application.name" . }}
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- if .Values.volumeMounts }}
+        volumeMounts:
+          {{- toYaml .Values.volumeMounts | nindent 8 }}
+        {{- end }}
+        {{- if .Values.env }}
+        env:
+          {{- toYaml .Values.env | nindent 8 }}
+        {{- end }}
+        {{- if .Values.envFromSecrets }}
+        envFrom:
+        {{- range .Values.envFromSecrets }}
+        - secretRef:
+            name: {{ .name }}
+        {{- end }}
+        {{- end }}
+      {{- if .Values.volumes }}
       volumes:
-{{- if .Values.volumes }}
-{{ toYaml .Values.volumes | indent 8 }}
-{{- end }}
+        {{- toYaml .Values.volumes | nindent 6 }}
+      {{- end }}
