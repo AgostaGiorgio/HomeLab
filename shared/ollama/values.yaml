@@ -1,5 +1,5 @@
 ollama:  
-  enabed: true
+  enabled: true
 
   image:
     repository: ollama/ollama
@@ -11,7 +11,7 @@ ollama:
   models:
     path: /models
     pull:
-      - llama3.2:3b-instruct-q4_K_M
+      - qwen2.5:3b-instruct-q4_K_M
 
   storage:
     enabled: true

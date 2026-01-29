@@ -26,6 +26,8 @@ spec:
           env:
             - name: OLLAMA_MODELS
               value: {{ .Values.models.path }}
+            - name: OLLAMA_NUM_THREADS
+              value: "12"
           volumeMounts:
             - mountPath: {{ .Values.models.path }}
               name: model-storage
