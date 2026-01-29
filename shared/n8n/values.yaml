@@ -51,9 +51,6 @@ n8n:
     - name: n8n-storage
       mountPath: /home/node/.n8n
 
-  envFromSecrets:
-    - name: n8n-secrets
-
   env:
     - name: N8N_BASIC_AUTH_ACTIVE
       value: false
