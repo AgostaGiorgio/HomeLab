@@ -1,0 +1,64 @@
+n8n: 
+  enabled: true
+  fullnameOverride: n8n
+
+
+  image:
+    registry: docker.io/n8nio
+    repository: n8n
+    tag: "2.6.2"
+    pullPolicy: Always
+
+  replicaCount: 1
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+    targetPort: 5678
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    hosts:
+      - host: n8n.agogi.dev
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - n8n.agogi.dev
+        secretName: n8n-tls-secret
+
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "2000m"
+      memory: "4Gi" 
+
+  volumes:
+    - name: n8n-storage
+      persistentVolumeClaim:
+        claimName: n8n-pvc
+
+  volumeMounts:
+    - name: n8n-storage
+      mountPath: /home/node/.n8n
+
+  envFromSecrets:
+    - name: n8n-secrets
+
+  env:
+    - name: N8N_BASIC_AUTH_ACTIVE
+      value: false
+    - name: WEBHOOK_URL
+      value: "https://n8n.agogi.dev/"
+    - name: N8N_EDITOR_BASE_URL
+      value: "https://n8n.agogi.dev/"
+    
