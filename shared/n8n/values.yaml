@@ -58,4 +58,6 @@ n8n:
       value: "https://n8n.agogi.dev/"
     - name: N8N_EDITOR_BASE_URL
       value: "https://n8n.agogi.dev/"
+    - name: GENERIC_TIMEZONE
+      value: "Asia/Dubai"
     
