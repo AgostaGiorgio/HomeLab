@@ -57,10 +57,15 @@ myinves-fe:
         cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
         traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
         traefik.ingress.kubernetes.io/router.tls: "true"
-      host: myinves.agogi.dev
+      hosts:
+      - host: myinves.agogi.dev
+        paths:
+          - path: /
+            pathType: Prefix
       tls:
-        enabled: true
-        secretName: myinves-tls-secret
+        - hosts:
+            - myinves.agogi.dev
+          secretName: myinves-tls-secret
 
   env:
     - name: VITE_API_BASE_URL
