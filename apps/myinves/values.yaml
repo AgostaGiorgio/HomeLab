@@ -24,14 +24,14 @@ myinves-be:
 
   env:
     # Postgres configuration
-    - name: POSTGRESQL_CONNECTION_URI
-      value: postgresql+asyncpg://${POSTGRESQL_USER}:${POSTGRESQL_PASSWORD}@${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
     - name: POSTGRES_HOST
       value: postgresql.postgres.svc.cluster.local
     - name: POSTGRES_PORT
-      value: "5432"
+      value: 5432
     - name: POSTGRES_DATABASE
       value: myinves
+    - name: POSTGRESQL_CONNECTION_URI
+      value: postgresql+asyncpg://${POSTGRESQL_USER}:${POSTGRESQL_PASSWORD}@${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
 
 myinves-fe: 
   enabled: true
