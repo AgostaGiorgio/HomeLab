@@ -12,12 +12,27 @@ myinves-be:
 
   service:
     enabled: true
-    type: ClusterIP
+    type: NodePort
     port: 8080
     targetPort: 8080
+    nodePort: 30080
 
   ingress:
-    enabled: false
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    className: "traefik"
+    hosts:
+      - host: api.myinves.agogi.dev
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+        - api.myinves.agogi.dev
+        secretName: api.myinves-tls-secret
 
   envFromSecrets:
     - name: myinves-secrets
