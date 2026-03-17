@@ -51,21 +51,21 @@ myinves-fe:
     port: 80
 
   ingress:
-      enabled: true
-      className: "traefik"
-      annotations:
-        cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
-        traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
-        traefik.ingress.kubernetes.io/router.tls: "true"
-      hosts:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    hosts:
       - host: myinves.agogi.dev
         paths:
           - path: /
             pathType: Prefix
-      tls:
-        - hosts:
-            - myinves.agogi.dev
-          secretName: myinves-tls-secret
+    tls:
+      - hosts:
+        - myinves.agogi.dev
+        secretName: myinves-tls-secret
 
   env:
     - name: VITE_API_BASE_URL
