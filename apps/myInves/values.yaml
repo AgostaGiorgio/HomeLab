@@ -1,6 +1,6 @@
-myInves-be: 
+myinves-be: 
   enabled: true
-  fullnameOverride: myInves-be
+  fullnameOverride: myinves-be
 
   image:
     registry: registry.agogi.dev
