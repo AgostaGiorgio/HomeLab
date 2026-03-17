@@ -27,7 +27,7 @@ myinves-be:
     - name: POSTGRESQL_HOST
       value: postgresql.postgres.svc.cluster.local
     - name: POSTGRESQL_PORT
-      value: '5432'
+      value: "5432"
     - name: POSTGRESQL_DATABASE
       value: myinves
     - name: POSTGRESQL_CONNECTION_URI
