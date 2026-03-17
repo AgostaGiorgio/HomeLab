@@ -12,10 +12,9 @@ myinves-be:
 
   service:
     enabled: true
-    type: NodePort
+    type: ClusterIP
     port: 8080
     targetPort: 8080
-    nodePort: 30180
 
   ingress:
     enabled: true
@@ -82,4 +81,4 @@ myinves-fe:
 
   env:
     - name: VITE_API_BASE_URL
-      value: myinves-be.myinves.svc.cluster.local:8080
+      value: https://api.myinves.agogi.dev
