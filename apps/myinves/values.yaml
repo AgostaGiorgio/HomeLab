@@ -32,3 +32,36 @@ myinves-be:
       value: "5432"
     - name: POSTGRES_DATABASE
       value: myinves
+
+myinves-fe: 
+  enabled: true
+  fullnameOverride: myinves-fe
+
+  image:
+    registry: registry.agogi.dev
+    repository: myinves_fe
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  replicaCount: 1
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+
+  ingress:
+      enabled: true
+      className: "traefik"
+      annotations:
+        cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+        traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+        traefik.ingress.kubernetes.io/router.tls: "true"
+      host: myinves.agogi.dev
+      tls:
+        enabled: true
+        secretName: myinves-tls-secret
+
+  env:
+    - name: VITE_API_BASE_URL
+      value: myinves-be.myinves.svc.cluster.local:8080

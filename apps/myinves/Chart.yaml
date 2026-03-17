@@ -11,8 +11,8 @@ dependencies:
     version: 0.1.0
     repository: "file://../../charts/applications"
     condition: myinves-be.enabled
-  # - name: frontend
-  #   alias: myinves-fe
-  #   version: 1.0.0
-  #   repository: "file://../../charts/applications"
-  #   condition: myinves-fe.enabled
+  - name: base-application
+    alias: myinves-fe
+    version: 0.1.0
+    repository: "file://../../charts/applications"
+    condition: myinves-fe.enabled
