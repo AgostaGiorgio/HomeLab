@@ -1,12 +1,12 @@
-mtrack: 
+mtrack-be: 
   enabled: true
-  fullnameOverride: mtrack
+  fullnameOverride: mtrack-be
 
 
   image:
     registry: registry.agogi.dev
-    repository: mtrack
-    tag: "1.0.0"
+    repository: mtrack_be
+    tag: "2.0.0"
     pullPolicy: Always
 
   replicaCount: 1
@@ -18,55 +18,69 @@ mtrack:
     targetPort: 8080
 
   ingress:
-    enabled: false
-
-  resources:
-    requests:
-      cpu: "1000m"
-      memory: "2Gi"
-    limits:
-      cpu: "4000m"
-      memory: "6Gi" 
-
-  volumes:
-    - name: mtrack-storage
-      persistentVolumeClaim:
-        claimName: mtrack-pvc
-
-  volumeMounts:
-    - name: mtrack-storage
-      mountPath: /mnt/data
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    className: "traefik"
+    hosts:
+      - host: api.mtrack.agogi.dev
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+        - api.mtrack.agogi.dev
+        secretName: api.mtrack-tls-secret
 
   envFromSecrets:
     - name: mtrack-secrets
 
   env:
-    # Voice/Whisper paths (use mounted PVC)
-    - name: VOICE_RECORDING_DOWNLOAD_PATH
-      value: /mnt/data/voices
-    - name: WHISPER_MODEL_DOWNLOAD_PATH
-      value: /mnt/data/models
-    - name: WHISPER_MODEL_SIZE
-      value: small
-
-    # LLM configuration
-    - name: LLM_URL
-      value: http://ollama.ollama.svc.cluster.local:11434/api/chat
-    - name: LLM_MODEL
-      value: llama3.2:3b-instruct-q4_K_M
-
     # Postgres configuration
-    - name: POSTGRES_HOST
+    - name: POSTGRESQL_HOST
       value: postgresql.postgres.svc.cluster.local
-    - name: POSTGRES_PORT
+    - name: POSTGRESQL_PORT
       value: "5432"
-    - name: POSTGRES_DATABASE
+    - name: POSTGRESQL_DATABASE
       value: mtrack
 
-    # App configuration
-    - name: MTRACK_CATEGORIES
-      value: '["Unknown","Cibo","Trasporto","Salute","Vestiti","Casa","Sport","Altro","Abbonamenti","Regali","Parcheggio","Benzina","Macchina","Bollette","Dewa/TAQA","Chiller","Internet","Gas","Barbiere","Documenti","Multe","Salik","Edoardo","Latte/Cibo","Pannolini","Taxi","Aereo","Spesa","Cene/Pranzi Extra","Colazioni-Lavoro","Service","Commissioni","Affitto","Arredo","Studio","Investimento","Assicurazione"]'
-    - name: MTRACK_PRIMARY_SECONDARY_CATEGORIES
-      value: '[["Altro","Sport"],["Altro","Regali"],["Altro","Documenti"],["Macchina","Parcheggio"],["Macchina","Benzina"],["Macchina","Multe"],["Macchina","Salik"],["Bollette","Dewa/TAQA"],["Bollette","Chiller"],["Bollette","Internet"],["Bollette","Gas"],["Edoardo","Latte/Cibo"],["Edoardo","Pannolini"],["Vestiti","Sport"],["Edoardo","Salute"],["Trasporto","Taxi"],["Trasporto","Aereo"],["Cibo","Spesa"],["Cibo","Cene/Pranzi Extra"],["Cibo","Colazioni-Lavoro"],["Macchina","Service"],["Casa","Commissioni"],["Casa","Affitto"],["Casa","Arredo"],["Macchina","Assicurazione"]]'
-    - name: MTRACK_CARD_ACCOUNTS
-      value: '["9314","8281","Cash","3327","Saving","Conto Principale","1456"]'
+
+mtrack-fe: 
+  enabled: true
+  fullnameOverride: mtrack-fe
+
+  image:
+    registry: registry.agogi.dev
+    repository: mtrack_fe
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  replicaCount: 1
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    hosts:
+      - host: mtrack.agogi.dev
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+        - mtrack.agogi.dev
+        secretName: mtrack-tls-secret
+
+  env:
+    - name: VITE_API_BASE_URL
+      value: https://api.mtrack.agogi.dev

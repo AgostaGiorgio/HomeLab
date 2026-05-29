@@ -7,7 +7,12 @@ appVersion: "1.0"
 
 dependencies:
   - name: base-application
-    alias: mtrack
+    alias: mtrack-be
     version: 0.1.0
     repository: "file://../../charts/applications"
-    condition: mtrack.enabled
+    condition: mtrack-be.enabled
+  - name: base-application
+    alias: mtrack-fe
+    version: 0.1.0
+    repository: "file://../../charts/applications"
+    condition: mtrack-fe.enabled
