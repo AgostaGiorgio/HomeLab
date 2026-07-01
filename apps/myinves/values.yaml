@@ -5,7 +5,7 @@ myinves-be:
   image:
     registry: registry.agogi.dev
     repository: myinves_be
-    tag: "1.0.0"
+    tag: "1.1.0"
     pullPolicy: Always
 
   replicaCount: 1
@@ -44,6 +44,8 @@ myinves-be:
       value: "5432"
     - name: POSTGRESQL_DATABASE
       value: myinves
+    - name: ORBIT_API_URL
+      value: https://api.orbit.agogi.dev/api/v1/register
 
 myinves-fe: 
   enabled: true

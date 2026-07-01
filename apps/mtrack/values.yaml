@@ -6,7 +6,7 @@ mtrack-be:
   image:
     registry: registry.agogi.dev
     repository: mtrack_be
-    tag: "2.0.0"
+    tag: "2.1.0"
     pullPolicy: Always
 
   replicaCount: 1
@@ -45,7 +45,8 @@ mtrack-be:
       value: "5432"
     - name: POSTGRESQL_DATABASE
       value: mtrack
-
+    - name: ORBIT_API_URL
+      value: https://api.orbit.agogi.dev/api/v1/register
 
 mtrack-fe: 
   enabled: true
