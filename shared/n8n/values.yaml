@@ -4,9 +4,9 @@ n8n:
 
 
   image:
-    registry: docker.io/n8nio
-    repository: n8n
-    tag: "2.6.2"
+    registry: registry.agogi.dev
+    repository: custom-n8n
+    tag: latest
     pullPolicy: Always
 
   replicaCount: 1
