@@ -71,6 +71,7 @@ myinves-fe:
       cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
       traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
       traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.middlewares: default-authentik-redirect@kubernetescrd
     hosts:
       - host: myinves.agogi.dev
         paths:
