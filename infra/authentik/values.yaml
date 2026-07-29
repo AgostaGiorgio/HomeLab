@@ -9,6 +9,13 @@ server:
   envFrom:
   - secretRef:
       name: authentik
+  volumes:
+    - name: media
+      persistentVolumeClaim:
+        claimName: authentik-pvc
+  volumeMounts:
+    - name: media
+      mountPath: /media  
   ingress:
     enabled: true
     ingressClassName: traefik
@@ -38,6 +45,13 @@ worker:
   envFrom:
   - secretRef:
       name: authentik
+  volumes:
+    - name: media
+      persistentVolumeClaim:
+        claimName: authentik-pvc
+  volumeMounts:
+    - name: media
+      mountPath: /media
 
 postgresql:
   enabled: true
