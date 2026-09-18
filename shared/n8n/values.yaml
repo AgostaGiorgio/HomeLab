@@ -64,6 +64,8 @@ n8n:
       value: "external"
     - name: N8N_RUNNERS_BROKER_LISTEN_ADDRESS
       value: "0.0.0.0"
+    - name: N8N_PORT
+      value: "5678"
 
   envFromSecrets:
     - name: n8n-runner-token
@@ -79,7 +81,7 @@ n8n:
           valueFrom:
             secretKeyRef:
               name: n8n-runner-token
-              key: RUNNER_AUTH_TOKEN
+              key: N8N_RUNNERS_AUTH_TOKEN
         - name: N8N_RUNNERS_LAUNCHER_LOG_LEVEL
           value: "info"
       resources:
