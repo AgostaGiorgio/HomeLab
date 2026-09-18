@@ -60,4 +60,33 @@ n8n:
       value: "https://n8n.agogi.dev/"
     - name: GENERIC_TIMEZONE
       value: "Asia/Dubai"
+    - name: N8N_RUNNERS_MODE
+      value: "external"
+    - name: N8N_RUNNERS_BROKER_LISTEN_ADDRESS
+      value: "0.0.0.0"
+
+  envFromSecrets:
+    - name: n8n-runner-token
+
+  extraContainers:
+    - name: task-runners
+      image: "registry.agogi.dev/custom-n8n-runners:2.6.2"
+      imagePullPolicy: Always
+      env:
+        - name: N8N_RUNNERS_TASK_BROKER_URI
+          value: "http://127.0.0.1:5679"
+        - name: N8N_RUNNERS_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: n8n-runner-token
+              key: RUNNER_AUTH_TOKEN
+        - name: N8N_RUNNERS_LAUNCHER_LOG_LEVEL
+          value: "info"
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "256Mi"
+        limits:
+          cpu: "1000m"
+          memory: "1Gi"
     

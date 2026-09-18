@@ -39,6 +39,9 @@ spec:
             name: {{ .name }}
         {{- end }}
         {{- end }}
+      {{- if .Values.extraContainers }}
+      {{- toYaml .Values.extraContainers | nindent 6 }}
+      {{- end }}
       {{- if .Values.volumes }}
       volumes:
         {{- toYaml .Values.volumes | nindent 6 }}

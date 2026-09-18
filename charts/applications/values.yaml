@@ -67,3 +67,6 @@ envFromSecrets: []
 
 # --- Environment variables ---
 env: []
+
+# --- Sidecar containers ---
+extraContainers: []
