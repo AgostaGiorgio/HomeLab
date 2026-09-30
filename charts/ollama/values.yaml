@@ -6,7 +6,7 @@ fullnameOverride: ""
 
 image:
   repository: ollama/ollama
-  tag: latest
+  tag: 0.35.0
   pullPolicy: IfNotPresent
 
 # Replica count
@@ -15,10 +15,11 @@ replicaCount: 1
 # Resources configuration
 resources:
   requests:
-    cpu: "8"
-    memory: "8Gi"
+    cpu: "4"
+    memory: "4Gi"
   limits:
-    memory: "24Gi"
+    cpu: "8"
+    memory: "12Gi"
 
 # Model configuration
 models:
@@ -28,6 +29,8 @@ models:
   pull:
     - qwen2.5:3b-instruct-q4_K_M
     - llama3.2:3b-instruct-q4_K_M
+    - SparkLLM/Spark-X2.5-4B:q8_0
+    - SparkLLM/Spark-X2.5-4B:q4_K_M
 
 # Storage configuration
 storage:
