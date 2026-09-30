@@ -79,3 +79,16 @@ probes:
     path: /health
     initialDelaySeconds: 10
     periodSeconds: 10
+
+# One-shot Job that creates buckets + anonymous read policy + CORS.
+# RustFS never creates buckets by itself.
+bucketInit:
+  enabled: false
+  buckets: []
+  # 0 keeps the finished Job around (no re-run on every sync). Set >0 to auto-clean.
+  ttlSecondsAfterFinished: 0
+  image:
+    registry: docker.io
+    repository: rustfs/rc
+    tag: "latest"
+    pullPolicy: IfNotPresent

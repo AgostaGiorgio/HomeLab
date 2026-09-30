@@ -44,7 +44,6 @@ lobehub:
 
   envFromSecrets:
     - name: lobehub-secrets
-    - name: lobehub-s3-secrets
 
   env:
     - name: APP_URL
@@ -63,6 +62,24 @@ lobehub:
     - name: OLLAMA_PROXY_URL
       value: "http://ollama.ollama.svc.cluster.local:11434"
     - name: SSRF_ALLOW_PRIVATE_IP_ADDRESS
+      value: "1"
+    - name: S3_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef:
+          name: lobehub-s3-secrets
+          key: RUSTFS_ACCESS_KEY
+    - name: S3_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: lobehub-s3-secrets
+          key: RUSTFS_SECRET_KEY
+    - name: S3_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: lobehub-s3-secrets
+          key: RUSTFS_ACCESS_KEY
+    # Ollama runs in-cluster and can't fetch presigned public URLs: inline images as base64
+    - name: LLM_VISION_IMAGE_USE_BASE64
       value: "1"
     - name: S3_ENDPOINT
       value: "https://s3.agogi.dev"

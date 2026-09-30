@@ -6,6 +6,9 @@ metadata:
     {{- include "s3.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  # Single RWO volume: never run two RustFS pods against the same data dir
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "s3.selectorLabels" . | nindent 6 }}

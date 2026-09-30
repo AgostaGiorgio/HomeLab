@@ -1,0 +1,97 @@
+# One-shot bucket bootstrap (mirrors the official LobeHub rustfs-init job).
+# The main container does not wait for this job, so it is safe to re-run.
+{{- if and .Values.bucketInit.enabled (gt (len .Values.bucketInit.buckets) 0) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "s3.fullname" . }}-bucket-init
+  labels:
+    {{- include "s3.labels" . | nindent 4 }}
+data:
+  {{- range .Values.bucketInit.buckets }}
+  {{ . }}.config.json: |
+    {
+      "Id": "",
+      "Statement": [
+        {
+          "Sid": "",
+          "Effect": "Allow",
+          "Principal": { "AWS": ["*"] },
+          "Action": ["s3:GetObject"],
+          "NotAction": [],
+          "Resource": ["arn:aws:s3:::{{ . }}/*"],
+          "NotResource": [],
+          "Condition": {}
+        }
+      ],
+      "Version": "2012-10-17"
+    }
+  {{- end }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "s3.fullname" . }}-bucket-init
+  labels:
+    {{- include "s3.labels" . | nindent 4 }}
+  annotations:
+    # The Job spec is immutable; let ArgoCD replace it instead of failing to patch
+    argocd.argoproj.io/sync-options: Replace=true
+spec:
+  {{- if gt (int .Values.bucketInit.ttlSecondsAfterFinished) 0 }}
+  # self-cleanup so later spec changes don't collide with a finished Job
+  ttlSecondsAfterFinished: {{ .Values.bucketInit.ttlSecondsAfterFinished }}
+  {{- end }}
+  backoffLimit: 20
+  template:
+    metadata:
+      labels:
+        {{- include "s3.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: bucket-init
+          image: "{{ .Values.bucketInit.image.registry }}/{{ .Values.bucketInit.image.repository }}:{{ .Values.bucketInit.image.tag }}"
+          imagePullPolicy: {{ .Values.bucketInit.image.pullPolicy }}
+          entrypoint: ["/bin/sh"]
+          command:
+            - -ec
+            - |
+              rc alias set s3 "$S3_URL" "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY"
+
+              # The RustFS Deployment may still be starting; loop until the API answers.
+              until rc ls s3 >/dev/null 2>&1; do
+                echo "waiting for RustFS at $S3_URL ..."
+                sleep 5
+              done
+
+              for bucket in $BUCKETS; do
+                echo "ensuring bucket: $bucket"
+                rc mb "s3/$bucket" --ignore-existing
+                rc anonymous set-json "/config/$bucket.config.json" "s3/$bucket"
+                printf "%s" "<CORSConfiguration><CORSRule><AllowedOrigin>*</AllowedOrigin><AllowedMethod>GET</AllowedMethod><AllowedMethod>PUT</AllowedMethod><AllowedMethod>HEAD</AllowedMethod><AllowedHeader>*</AllowedHeader><ExposeHeader>ETag</ExposeHeader><MaxAgeSeconds>3600</MaxAgeSeconds></CORSRule></CORSConfiguration>" | rc bucket cors set "s3/$bucket" -
+              done
+              rc ls s3
+              echo "bucket init completed"
+          env:
+            # rc persists its alias config under $HOME; keep it on writable storage
+            - name: HOME
+              value: /tmp
+            - name: S3_URL
+              value: "http://{{ include "s3.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+            - name: BUCKETS
+              value: {{ join " " .Values.bucketInit.buckets | quote }}
+          envFrom:
+            {{- range .Values.envFromSecrets }}
+            - secretRef:
+                name: {{ .name }}
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "s3.fullname" . }}-bucket-init
+{{- end }}
