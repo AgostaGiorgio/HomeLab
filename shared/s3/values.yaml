@@ -1,0 +1,63 @@
+s3:
+  enabled: true
+
+  # Service/Deployment/Ingress name => "s3"
+  fullnameOverride: s3
+
+  image:
+    registry: docker.io
+    repository: rustfs/rustfs
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  # RustFS is configured via RUSTFS_* environment variables.
+  # Credentials (RUSTFS_ACCESS_KEY / RUSTFS_SECRET_KEY) come from the "s3-secrets" secret.
+  env:
+    - name: RUSTFS_ADDRESS
+      value: "0.0.0.0:9000"
+    - name: RUSTFS_CONSOLE_ADDRESS
+      value: "0.0.0.0:9001"
+    - name: RUSTFS_CONSOLE_ENABLE
+      value: "true"
+    - name: RUSTFS_VOLUMES
+      value: "/data"
+    - name: RUSTFS_OBS_LOGGER_LEVEL
+      value: "info"
+
+  envFromSecrets:
+    - name: s3-secrets
+
+  service:
+    type: ClusterIP
+    port: 9000
+    console:
+      enabled: false
+      port: 9001
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    host: s3.agogi.dev
+    path: /
+    pathType: Prefix
+    tls:
+      enabled: true
+      secretName: s3-tls-secret
+
+  persistence:
+    mountPath: /data
+    existingClaim: "s3-pvc"
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"

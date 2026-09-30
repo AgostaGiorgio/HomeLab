@@ -1,0 +1,12 @@
+apiVersion: v2
+name: s3
+description: Chart to deploy RustFS (S3-compatible object storage) using the dedicated s3 chart
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+dependencies:
+  - name: s3
+    version: 1.0.0
+    repository: "file://../../charts/s3"
+    condition: s3.enabled

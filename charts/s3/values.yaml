@@ -1,0 +1,81 @@
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  registry: docker.io
+  repository: rustfs/rustfs
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+# Plain environment variables for the container
+env: []
+
+# Secrets loaded as environment variables (e.g. RUSTFS_ACCESS_KEY / RUSTFS_SECRET_KEY)
+envFromSecrets: []
+
+service:
+  type: ClusterIP
+  # S3 API port
+  port: 9000
+  # Web console (optional)
+  console:
+    enabled: false
+    port: 9001
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  host: s3.local
+  path: /
+  pathType: Prefix
+  tls:
+    enabled: false
+    secretName: s3-tls-secret
+
+persistence:
+  mountPath: /data
+  # Name of an existing PVC (created separately, see config/)
+  existingClaim: ""
+
+# Fix ownership of the (hostPath) data directory before the main container starts
+volumePermissions:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: alpine
+    tag: "3.20"
+    pullPolicy: IfNotPresent
+  # Runs as root to be able to chown the data directory
+  runAsUser: 0
+
+podSecurityContext:
+  fsGroup: 10001
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  allowPrivilegeEscalation: false
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+probes:
+  liveness:
+    enabled: true
+    path: /health
+    initialDelaySeconds: 30
+    periodSeconds: 20
+  readiness:
+    enabled: true
+    path: /health
+    initialDelaySeconds: 10
+    periodSeconds: 10

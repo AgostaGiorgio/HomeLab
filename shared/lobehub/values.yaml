@@ -44,6 +44,7 @@ lobehub:
 
   envFromSecrets:
     - name: lobehub-secrets
+    - name: lobehub-s3-secrets
 
   env:
     - name: APP_URL
@@ -64,7 +65,13 @@ lobehub:
     - name: SSRF_ALLOW_PRIVATE_IP_ADDRESS
       value: "1"
     - name: S3_ENDPOINT
-      value: "http://lobehub-s3:9000" #THIS DOESNT EXIST
+      value: "https://s3.agogi.dev"
+    - name: S3_INTERNAL_ENDPOINT
+      value: "http://s3.s3.svc.cluster.local:9000"
+    - name: S3_BUCKET
+      value: "lobehub"
+    - name: S3_ENABLE_PATH_STYLE
+      value: "1"
 
 postgresql:
   enabled: true
