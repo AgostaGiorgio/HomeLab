@@ -11,7 +11,7 @@ ollama:
   models:
     path: /models
     pull:
-    - SparkLLM/Spark-X2.5-4B:q4_K_M
+    - hf.co/XHToken/Spark-X2.5-4B-GGUF:Q4_K_M
 
   storage:
     enabled: true
