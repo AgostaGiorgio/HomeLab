@@ -53,8 +53,8 @@ spec:
         - name: bucket-init
           image: "{{ .Values.bucketInit.image.registry }}/{{ .Values.bucketInit.image.repository }}:{{ .Values.bucketInit.image.tag }}"
           imagePullPolicy: {{ .Values.bucketInit.image.pullPolicy }}
-          entrypoint: ["/bin/sh"]
           command:
+            - /bin/sh
             - -ec
             - |
               rc alias set s3 "$S3_URL" "$RUSTFS_ACCESS_KEY" "$RUSTFS_SECRET_KEY"
