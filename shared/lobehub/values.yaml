@@ -63,6 +63,8 @@ lobehub:
       value: "http://ollama.ollama.svc.cluster.local:11434"
     - name: SSRF_ALLOW_PRIVATE_IP_ADDRESS
       value: "1"
+    - name: S3_ENDPOINT
+      value: "http://lobehub-s3:9000" #THIS DOESNT EXIST
 
 postgresql:
   enabled: true
