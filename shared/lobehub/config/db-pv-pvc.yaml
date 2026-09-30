@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: lobehub-db-pv
+  labels:
+    type: ssd
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  hostPath:
+    path: /mnt/ssd1/lobehub-postgres
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lobehub-db-pvc
+  namespace: lobehub
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  volumeName: lobehub-db-pv
+  storageClassName: ""

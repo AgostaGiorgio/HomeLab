@@ -1,0 +1,105 @@
+lobehub:
+  enabled: true
+
+  fullnameOverride: lobehub
+
+  image:
+    registry: docker.io
+    repository: lobehub/lobehub
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+    targetPort: 3210
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    hosts:
+      - host: chat.agogi.dev
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - chat.agogi.dev
+        secretName: lobehub-tls-secret
+
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "512Mi"
+    limits:
+      cpu: "2000m"
+      memory: "2Gi"
+
+  envFromSecrets:
+    - name: lobehub-secrets
+
+  env:
+    - name: APP_URL
+      value: "https://chat.agogi.dev"
+    - name: INTERNAL_APP_URL
+      value: "http://lobehub:3210"
+    - name: POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: lobehub-secrets
+          key: password
+    - name: DATABASE_URL
+      value: "postgresql://postgres:$(POSTGRES_PASSWORD)@lobehub-db:5432/lobehub"
+    - name: FTS_SEARCH_PROVIDER
+      value: "pg_search"
+    - name: OLLAMA_PROXY_URL
+      value: "http://ollama.ollama.svc.cluster.local:11434"
+    - name: SSRF_ALLOW_PRIVATE_IP_ADDRESS
+      value: "1"
+
+postgresql:
+  enabled: true
+
+  fullnameOverride: lobehub-db
+
+  postgresql:
+    image:
+      registry: docker.io
+      repository: paradedb/paradedb
+      tag: latest-pg15
+      pullPolicy: IfNotPresent
+
+    auth:
+      existingSecret: "lobehub-secrets"
+      postgresPasswordKey: "password"
+      passwordKey: "password"
+      username: "postgres"
+      database: "lobehub"
+
+    persistence:
+      enabled: true
+      existingClaim: "lobehub-db-pvc"
+      mountPath: /var/lib/postgresql/data
+      subPath: "pgdata"
+
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "2000m"
+        memory: "2Gi"
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  pgadmin:
+    enabled: false
