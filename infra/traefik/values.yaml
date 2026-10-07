@@ -49,6 +49,11 @@ additionalArguments:
   - "--entrypoints.websecure.address=:443"
   - "--api.dashboard=false"
   - "--ping=true"
+  - "--entrypoints.websecure.transport.respondingtimeouts.readtimeout=0s"
+  - "--entrypoints.websecure.transport.respondingtimeouts.writetimeout=0s"
+  - "--entrypoints.websecure.transport.respondingtimeouts.idletimeout=0s"
+  - "--entrypoints.websecure.transport.keepalivemaxtime=0s"
+  - "--entrypoints.websecure.transport.keepalivemaxrequests=0"
 
 resources:
   requests:
