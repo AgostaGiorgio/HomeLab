@@ -11,6 +11,8 @@ n8n:
 
   replicaCount: 1
 
+  serviceAccountName: n8n-job-runner
+
   service:
     enabled: true
     type: ClusterIP
@@ -46,10 +48,15 @@ n8n:
     - name: n8n-storage
       persistentVolumeClaim:
         claimName: n8n-pvc
+    - name: n8n-shared
+      persistentVolumeClaim:
+        claimName: n8n-shared-pvc
 
   volumeMounts:
     - name: n8n-storage
       mountPath: /home/node/.n8n
+    - name: n8n-shared
+      mountPath: /data/shared
 
   env:
     - name: N8N_BASIC_AUTH_ACTIVE
@@ -66,6 +73,8 @@ n8n:
       value: "0.0.0.0"
     - name: N8N_PORT
       value: "5678"
+    - name: NODES_EXCLUDE
+      value: '["n8n-nodes-base.localFileTrigger"]'
 
   envFromSecrets:
     - name: n8n-runner-token

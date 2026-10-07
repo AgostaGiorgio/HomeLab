@@ -11,6 +11,9 @@ image:
 
 replicaCount: 1
 
+# --- Service Account ---
+serviceAccountName: ""
+
 ports:
   - name: http
     containerPort: 80

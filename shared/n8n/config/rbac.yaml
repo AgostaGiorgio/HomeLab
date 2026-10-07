@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: n8n-job-runner
+  namespace: n8n
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: n8n-job-runner
+  namespace: n8n
+rules:
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: n8n-job-runner
+  namespace: n8n
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: n8n-job-runner
+subjects:
+  - kind: ServiceAccount
+    name: n8n-job-runner
+    namespace: n8n

@@ -14,6 +14,9 @@ spec:
       labels:
         {{- include "application.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- end }}
       containers:
       - name: {{ include "application.name" . }}
         image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
