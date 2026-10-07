@@ -13,9 +13,13 @@ and exchange files with them through a shared volume.
 - **Shared volume** `n8n-shared-pvc` (`config/shared-pvc.yaml`) is a
   `ReadWriteMany` hostPath PV at `/mnt/ssd1/n8n-shared`, mounted into n8n at
   `/data/shared`. Jobs mount the same PVC.
+- **Skills volume** `opencode-skills-pvc` (`config/opencode-skills-pvc.yaml`) is
+  a `ReadWriteMany` hostPath PV at `/mnt/ssd1/opencode-skills`, consumed by the
+  opencode Jobs (mount only — n8n does not mount it).
 
-> The host path must be writable by the n8n user (`node`, uid `1000`), e.g.:
-> `mkdir -p /mnt/ssd1/n8n-shared && chown 1000:1000 /mnt/ssd1/n8n-shared && chmod 775 /mnt/ssd1/n8n-shared`.
+> Host paths must be accessible by the n8n/Job user (`node`, uid `1000`):
+> `mkdir -p /mnt/ssd1/n8n-shared && chown 1000:1000 /mnt/ssd1/n8n-shared && chmod 775 /mnt/ssd1/n8n-shared`
+> and `chmod -R a+rX /mnt/ssd1/opencode-skills` (skills are read-only).
 > `fsGroup` is not applied to hostPath volumes.
 
 ## Launching a Job from n8n
@@ -34,11 +38,77 @@ nodes:
    - Body: the Job manifest (YAML). Enable **"Ignore SSL Issues"**, or pass the
      cluster CA from `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`.
 
+Also **poll** `GET .../jobs/<name>/status` until `status.succeeded` (or failed)
+before continuing in the workflow.
+
 Notes:
 
 - Use `metadata.generateName` (not a fixed `name`) so every run creates a fresh
   Job — a `Job`'s `spec.template` is immutable and reusing the same name fails.
 - Set `spec.ttlSecondsAfterFinished` so finished Jobs are cleaned up.
+
+## Clone the repo (visible step)
+
+n8n ships `git` and gets the GitHub PAT as the `GITHUB_TOKEN` env var (the
+`n8n-github-token` secret is wired into `envFromSecrets`). Clone with an
+**Execute Command** node:
+
+```sh
+git -c http.extraHeader="Authorization: Bearer ${GITHUB_TOKEN}" \
+  clone --depth 1 https://github.com/<owner>/<repo>.git /data/shared/<repo>
+```
+
+## Example Job (opencode blackbox)
+
+Assumes n8n already cloned the repo into `/data/shared/<repo>` (visible step
+above). The command is fully explicit, so n8n shows exactly what runs.
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: opencode-
+  namespace: n8n
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: Never
+      workingDir: /data/shared/<repo>
+      containers:
+        - name: opencode
+          image: registry.agogi.dev/opencode-cli:latest
+          command: ["opencode"]
+          args:
+            - run
+            - --standalone
+            - --model
+            - opencode-go/deepseek-v4.1-flash
+            - --agent
+            - build
+            - "<prompt / task>"
+          env:
+            - name: OPENCODE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-opencode-token
+                  key: OPENCODE_API_KEY
+          volumeMounts:
+            - name: shared
+              mountPath: /data/shared
+            - name: skills
+              mountPath: /opt/opencode-skills
+              readOnly: true
+      volumes:
+        - name: shared
+          persistentVolumeClaim:
+            claimName: n8n-shared-pvc
+        - name: skills
+          persistentVolumeClaim:
+            claimName: opencode-skills-pvc
+```
+
+After it completes, n8n reads the files it produced from `/data/shared/<repo>`.
 
 ## Example Job (shared-volume smoke test)
 

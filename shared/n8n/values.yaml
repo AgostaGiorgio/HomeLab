@@ -78,6 +78,7 @@ n8n:
 
   envFromSecrets:
     - name: n8n-runner-token
+    - name: n8n-github-token
 
   extraContainers:
     - name: task-runners
