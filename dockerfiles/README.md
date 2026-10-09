@@ -57,7 +57,7 @@ spec:
             - --model
             - opencode-go/deepseek-v4.1-flash
             - --agent
-            - build
+            - coding
             - "<prompt>"
           env:
             - name: OPENCODE_API_KEY
@@ -65,38 +65,98 @@ spec:
                 secretKeyRef: { name: n8n-opencode-token, key: OPENCODE_API_KEY }
           volumeMounts:
             - { name: shared, mountPath: /data/shared }
-            - { name: skills, mountPath: /opt/opencode-skills, readOnly: true }
+            - name: opencode
+              mountPath: /home/node/.config/opencode/skills
+              subPath: skills
+              readOnly: true
+            - name: opencode
+              mountPath: /home/node/.config/opencode/agents
+              subPath: agents
+              readOnly: true
       volumes:
         - name: shared
           persistentVolumeClaim: { claimName: n8n-shared-pvc }
-        - name: skills
-          persistentVolumeClaim: { claimName: opencode-skills-pvc }
+        - name: opencode
+          persistentVolumeClaim: { claimName: opencode-pvc }
 ```
 
 Key points:
 
 - `opencode run --standalone` receives `OPENCODE_API_KEY` from its own process
   environment (standalone uses a private server that inherits it).
-- `--agent build` is the agent allowed to edit files (the `plan` agent denies edits).
-- The prompt is an inline arg, so `n8n` shows exactly what runs.
+- `--agent <id>` selects the primary agent (see the agents below).
 
-### Skills
+### Skills and agents
 
-Skills are read from `/opt/opencode-skills` (set in the image's
-`opencode.jsonc`). They are served by the `opencode-skills-pvc` volume, backed by
-the host path `/mnt/ssd1/opencode-skills`. Put skill directories there:
+The `opencode-pvc` volume is backed by the host path `/mnt/ssd1/opencode` and is
+mounted as two **sub-paths** straight into the CLI's global discovery
+directories, so OpenCode finds both with no configuration:
 
 ```
-/mnt/ssd1/opencode-skills/
-└── my-skill/
-    └── SKILL.md
+/mnt/ssd1/opencode/
+├── skills/    → ~/.config/opencode/skills
+└── agents/    → ~/.config/opencode/agents
 ```
 
 The container runs as uid `1000`, so the host directory must be readable by it:
 
 ```bash
-chmod -R a+rX /mnt/ssd1/opencode-skills
+mkdir -p /mnt/ssd1/opencode/{skills,agents}
+chmod -R a+rX /mnt/ssd1/opencode
 ```
+
+Agents are Markdown files (`<id>.md`): frontmatter config plus the system prompt
+in the body. Starters for the code-generation flow:
+
+`agents/coding.md`
+
+```md
+---
+description: Implements the technical tasks from the spec
+mode: primary
+model: opencode-go/kimi-k2.7-code
+steps: 60
+permissions:
+  - { action: edit, resource: "*", effect: allow }
+  - { action: shell, resource: "*", effect: allow }
+---
+You are the implementation agent. Read .opencode-out/spec.md and implement the
+technical tasks in order. Follow the project coding skills when relevant.
+Keep changes minimal; do not commit. Write a summary to .opencode-out/coding-summary.md.
+```
+
+`agents/test.md`
+
+```md
+---
+description: Turns Gherkin scenarios into tests and runs them
+mode: primary
+model: opencode-go/deepseek-v4-pro
+steps: 50
+---
+You are the test agent. Read .opencode-out/spec.md (Gherkin) and the coding
+changes. Write tests and run the suite. Fix only test code. Write
+.opencode-out/test-summary.md with pass/fail and notes.
+```
+
+`agents/review.md`
+
+```md
+---
+description: Reviews changes without editing code
+mode: primary
+model: opencode-go/kimi-k3
+steps: 40
+permissions:
+  - { action: edit, resource: "*", effect: deny }
+  - { action: edit, resource: ".opencode-out/review.md", effect: allow }
+---
+You are the review agent. Review the diff against .opencode-out/spec.md and the
+coding skills. Do not modify code. Report findings by severity with file:line in
+.opencode-out/review.md.
+```
+
+n8n orchestrates one phase per Job with `--agent coding` / `test` / `review`.
 
 Store `OPENCODE_API_KEY` (and, if the workflow clones, the GitHub PAT) as
 `SealedSecret`s in the `n8n` namespace and reference them from the Job.

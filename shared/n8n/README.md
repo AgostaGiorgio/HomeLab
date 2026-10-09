@@ -13,13 +13,13 @@ and exchange files with them through a shared volume.
 - **Shared volume** `n8n-shared-pvc` (`config/shared-pvc.yaml`) is a
   `ReadWriteMany` hostPath PV at `/mnt/ssd1/n8n-shared`, mounted into n8n at
   `/data/shared`. Jobs mount the same PVC.
-- **Skills volume** `opencode-skills-pvc` (`config/opencode-skills-pvc.yaml`) is
-  a `ReadWriteMany` hostPath PV at `/mnt/ssd1/opencode-skills`, consumed by the
-  opencode Jobs (mount only — n8n does not mount it).
+- **opencode volume** `opencode-pvc` (`config/opencode-pvc.yaml`) backs host path
+  `/mnt/ssd1/opencode` (holding `skills/` and `agents/`). It is consumed only by
+  the opencode Jobs and mounted as sub-paths into `~/.config/opencode/{skills,agents}`.
 
 > Host paths must be accessible by the n8n/Job user (`node`, uid `1000`):
 > `mkdir -p /mnt/ssd1/n8n-shared && chown 1000:1000 /mnt/ssd1/n8n-shared && chmod 775 /mnt/ssd1/n8n-shared`
-> and `chmod -R a+rX /mnt/ssd1/opencode-skills` (skills are read-only).
+> and `mkdir -p /mnt/ssd1/opencode/{skills,agents} && chmod -R a+rX /mnt/ssd1/opencode` (skills/agents are read-only).
 > `fsGroup` is not applied to hostPath volumes.
 
 ## Launching a Job from n8n
@@ -51,12 +51,16 @@ Notes:
 
 n8n ships `git` and gets the GitHub PAT as the `GITHUB_TOKEN` env var (the
 `n8n-github-token` secret is wired into `envFromSecrets`). Clone with an
-**Execute Command** node:
+**Execute Command** node. Keep it on **one line** (the node runs a single shell
+command, not a multi-line script):
 
 ```sh
-git -c http.extraHeader="Authorization: Bearer ${GITHUB_TOKEN}" \
-  clone --depth 1 https://github.com/<owner>/<repo>.git /data/shared/<repo>
+GIT_TERMINAL_PROMPT=0 git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/<owner>/<repo>.git" /data/shared/<repo>
 ```
+
+`GIT_TERMINAL_PROMPT=0` makes git fail fast instead of trying to prompt. The
+token ends up in the command line (so it shows in the execution log); if you
+want to hide it, use a credential helper or `http.extraHeader` instead.
 
 ## Example Job (opencode blackbox)
 
@@ -85,7 +89,7 @@ spec:
             - --model
             - opencode-go/deepseek-v4.1-flash
             - --agent
-            - build
+            - coding
             - "<prompt / task>"
           env:
             - name: OPENCODE_API_KEY
@@ -96,19 +100,29 @@ spec:
           volumeMounts:
             - name: shared
               mountPath: /data/shared
-            - name: skills
-              mountPath: /opt/opencode-skills
+            - name: opencode
+              mountPath: /home/node/.config/opencode/skills
+              subPath: skills
+              readOnly: true
+            - name: opencode
+              mountPath: /home/node/.config/opencode/agents
+              subPath: agents
               readOnly: true
       volumes:
         - name: shared
           persistentVolumeClaim:
             claimName: n8n-shared-pvc
-        - name: skills
+        - name: opencode
           persistentVolumeClaim:
-            claimName: opencode-skills-pvc
+            claimName: opencode-pvc
 ```
 
 After it completes, n8n reads the files it produced from `/data/shared/<repo>`.
+
+A full code-generation run chains three Jobs on the same volumes with
+`--agent coding`, then `--agent test`, then `--agent review` (the review only
+writes `.opencode-out/review.md`; it does not modify code). Agent definitions
+live in `~/.config/opencode/agents/` — see `dockerfiles/README.md`.
 
 ## Example Job (shared-volume smoke test)
 

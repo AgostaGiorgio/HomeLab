@@ -1,8 +1,5 @@
 {
   "$schema": "https://opencode.ai/config.json",
   // Fallback model; Jobs pass --model explicitly so it is visible in n8n.
-  "model": "opencode-go/deepseek-v4.1-flash",
-  // Skills live on a separate host volume (/mnt/ssd1/opencode-skills) mounted
-  // into the Job at this path. See dockerfiles/README.md.
-  "skills": ["/opt/opencode-skills"]
+  "model": "opencode-go/deepseek-v4.1-flash"
 }
