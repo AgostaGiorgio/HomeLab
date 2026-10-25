@@ -1,0 +1,91 @@
+mind2code-be: 
+  enabled: true
+  fullnameOverride: mind2code-be
+
+  image:
+    registry: registry.agogi.dev
+    repository: mind2code_be
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  replicaCount: 1
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    className: "traefik"
+    hosts:
+      - host: api.mind2code.agogi.dev
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+        - api.mind2code.agogi.dev
+        secretName: api.mind2code-tls-secret
+
+  envFromSecrets:
+    - name: mind2code-secrets
+
+  env:
+    # Postgres configuration
+    - name: POSTGRESQL_HOST
+      value: postgresql.postgres.svc.cluster.local
+    - name: POSTGRESQL_PORT
+      value: "5432"
+    - name: POSTGRESQL_DATABASE
+      value: incubator
+    - name: APP_URL
+      value: https://mind2code.agogi.dev
+    - name: ORBIT_API_URL
+      value: https://api.orbit.agogi.dev/api/v1/register
+    - name: N8N_FINALIZE_WEBHOOK_URL
+      value: https://n8n.agogi.dev/webhook/finalyze
+
+mind2code-fe: 
+  enabled: true
+  fullnameOverride: mind2code-fe
+
+  image:
+    registry: registry.agogi.dev
+    repository: mind2code_fe
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  replicaCount: 1
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.middlewares: default-authentik-redirect@kubernetescrd
+    hosts:
+      - host: mind2code.agogi.dev
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+        - mind2code.agogi.dev
+        secretName: mind2code-tls-secret
+
+  env:
+    - name: VITE_API_BASE_URL
+      value: https://api.mind2code.agogi.dev
