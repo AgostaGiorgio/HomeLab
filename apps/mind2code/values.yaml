@@ -48,8 +48,18 @@ mind2code-be:
       value: https://mind2code.agogi.dev
     - name: ORBIT_API_URL
       value: https://api.orbit.agogi.dev/api/v1/register
-    - name: N8N_FINALIZE_WEBHOOK_URL
-      value: https://n8n.agogi.dev/webhook/finalyze
+    - name: N8N_PROJECT_TITLE_WEBHOOK_URL
+      value: https://n8n.agogi.dev/webhook/title
+    - name: N8N_REQUIREMENTS_WEBHOOK_URL
+      value: https://n8n.agogi.dev/webhook/requirements
+    - name: N8N_CODE_WEBHOOK_URL
+      value: https://n8n.agogi.dev/webhook/code
+    - name: N8N_TEST_WEBHOOK_URL
+      value: https://n8n.agogi.dev/webhook/test
+    - name: N8N_REVIEW_WEBHOOK_URL
+      value: https://n8n.agogi.dev/webhook/review
+    - name: N8N_RETROSPECTIVE_WEBHOOK_URL
+      value: https://n8n.agogi.dev/webhook/retrospective
 
 mind2code-fe: 
   enabled: true
