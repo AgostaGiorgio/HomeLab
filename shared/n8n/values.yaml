@@ -75,6 +75,10 @@ n8n:
       value: "5678"
     - name: NODES_EXCLUDE
       value: '["n8n-nodes-base.localFileTrigger"]'
+    - name: N8N_ALLOWED_FILESYSTEM_PATHS
+      value: "/data/shared"
+    - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+      value: "false"
 
   envFromSecrets:
     - name: n8n-runner-token
