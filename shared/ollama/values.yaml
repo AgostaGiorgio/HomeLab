@@ -1,5 +1,5 @@
 ollama:  
-  enabled: true
+  enabled: false
 
   image:
     repository: ollama/ollama

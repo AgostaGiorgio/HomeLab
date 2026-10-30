@@ -1,5 +1,5 @@
 lobehub:
-  enabled: true
+  enabled: false
 
   fullnameOverride: lobehub
 
@@ -91,7 +91,7 @@ lobehub:
       value: "1"
 
 postgresql:
-  enabled: true
+  enabled: false
 
   fullnameOverride: lobehub-db
 
