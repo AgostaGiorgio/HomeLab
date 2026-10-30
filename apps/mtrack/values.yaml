@@ -6,7 +6,7 @@ mtrack-be:
   image:
     registry: registry.agogi.dev
     repository: mtrack_be
-    tag: "2.2.0"
+    tag: "2.3.0"
     pullPolicy: Always
 
   replicaCount: 1
@@ -57,7 +57,7 @@ mtrack-fe:
   image:
     registry: registry.agogi.dev
     repository: mtrack_fe
-    tag: "2.2.0"
+    tag: "2.3.0"
     pullPolicy: Always
 
   replicaCount: 1
