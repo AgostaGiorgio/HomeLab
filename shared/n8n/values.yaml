@@ -98,6 +98,10 @@ n8n:
               key: N8N_RUNNERS_AUTH_TOKEN
         - name: N8N_RUNNERS_LAUNCHER_LOG_LEVEL
           value: "info"
+        - name: N8N_ALLOWED_FILESYSTEM_PATHS
+          value: "/data/shared"
+        - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+          value: "false"
       resources:
         requests:
           cpu: "100m"
