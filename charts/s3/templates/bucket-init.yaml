@@ -35,8 +35,13 @@ metadata:
   labels:
     {{- include "s3.labels" . | nindent 4 }}
   annotations:
-    # The Job spec is immutable; let ArgoCD replace it instead of failing to patch
-    argocd.argoproj.io/sync-options: Replace=true
+    # One-shot bootstrap: run after the Release is healthy and recreate it from
+    # scratch on every sync. Deleting before create avoids both the immutable
+    # Job spec error and the "spec.selector: Required value" error that
+    # Replace=true causes (the selector is only defaulted on create, never on
+    # update, and this template intentionally omits it).
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   {{- if gt (int .Values.bucketInit.ttlSecondsAfterFinished) 0 }}
   # self-cleanup so later spec changes don't collide with a finished Job
