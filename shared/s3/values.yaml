@@ -29,11 +29,11 @@ s3:
   envFromSecrets:
     - name: s3-secrets
 
-  # Creates the "lobehub" bucket + anonymous read + CORS (RustFS never does this itself)
   bucketInit:
     enabled: true
     buckets:
-      - lobehub
+      # - lobehub
+      - mynutri
 
   service:
     type: ClusterIP
