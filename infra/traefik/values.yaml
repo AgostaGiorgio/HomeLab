@@ -49,10 +49,15 @@ additionalArguments:
   - "--entrypoints.websecure.address=:443"
   - "--api.dashboard=false"
   - "--ping=true"
-  - "--entrypoints.websecure.transport.respondingtimeouts.readtimeout=180s"
-  - "--entrypoints.websecure.transport.respondingtimeouts.writetimeout=180s"
+  # readtimeout/writetimeout coprono l'INTERA request, body incluso: con un
+  # upload lento (push di layer grandi verso registry.agogi.dev) 180s non
+  # bastano e Traefik chiude la connessione a metà -> "broken pipe" lato client.
+  # 0 = nessun limite (streaming illimitato). idletimeout resta per le
+  # connessioni inattive.
+  - "--entrypoints.websecure.transport.respondingtimeouts.readtimeout=0"
+  - "--entrypoints.websecure.transport.respondingtimeouts.writetimeout=0"
   - "--entrypoints.websecure.transport.respondingtimeouts.idletimeout=180s"
-  - "--entrypoints.websecure.transport.keepalivemaxtime=180s"
+  - "--entrypoints.websecure.transport.keepalivemaxtime=0"
   - "--entrypoints.websecure.transport.keepalivemaxrequests=0"
 
 resources:
