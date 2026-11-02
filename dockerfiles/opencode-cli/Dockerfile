@@ -25,10 +25,11 @@ ARG OPENCODE_VERSION=latest
 
 # git for repository work, ripgrep for the agent's search tool.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends git ripgrep ca-certificates \
+ && apt-get install -y --no-install-recommends python3-pip python3-venv git ripgrep ca-certificates \
  && rm -rf /var/lib/apt/lists/* \
  && npm install --global "@opencode/cli@${OPENCODE_VERSION}" \
- && npm cache clean --force
+ && npm cache clean --force \
+ && pip install --no-cache-dir --break-system-packages poetry
 
 USER node
 ENV HOME=/home/node
