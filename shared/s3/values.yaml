@@ -33,7 +33,8 @@ s3:
     enabled: true
     buckets:
       # - lobehub
-      - mynutri
+      # - mynutri
+      - cescalab
 
   service:
     type: ClusterIP
