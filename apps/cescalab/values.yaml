@@ -1,0 +1,94 @@
+cescalab-be: 
+  enabled: true
+  fullnameOverride: cescalab-be
+
+  image:
+    registry: registry.agogi.dev
+    repository: cescalab_be
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  replicaCount: 1
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+
+  ingress:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    className: "traefik"
+    hosts:
+      - host: api.cescalab.agogi.dev
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+        - api.cescalab.agogi.dev
+        secretName: api.cescalab-tls-secret
+
+  envFromSecrets:
+    - name: cescalab-secrets
+
+  env:
+    # Postgres configuration
+    - name: POSTGRESQL_HOST
+      value: postgresql.postgres.svc.cluster.local
+    - name: POSTGRESQL_PORT
+      value: "5432"
+    - name: POSTGRESQL_DATABASE
+      value: cescalab
+    - name: APP_URL
+      value: https://cescalab.agogi.dev
+    - name: ORBIT_API_URL
+      value: https://api.orbit.agogi.dev/api/v1/register
+    - name: S3_ENDPOINT_URL
+      value: https://s3.agogi.dev
+    - name: S3_BUCKET
+      value: cescalab
+    - name: S3_PUBLIC_BASE_URL
+      value: https://s3.agogi.dev/cescalab
+
+cescalab-fe: 
+  enabled: true
+  fullnameOverride: cescalab-fe
+
+  image:
+    registry: registry.agogi.dev
+    repository: cescalab_fe
+    tag: "1.0.0"
+    pullPolicy: Always
+
+  replicaCount: 1
+
+  service:
+    enabled: true
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-production-cluster-issuer
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    hosts:
+      - host: cescalab.agogi.dev
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+        - cescalab.agogi.dev
+        secretName: cescalab-tls-secret
+
+  env:
+    - name: VITE_API_BASE_URL
+      value: https://api.cescalab.agogi.dev

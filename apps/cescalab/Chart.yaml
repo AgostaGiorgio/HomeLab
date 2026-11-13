@@ -1,0 +1,18 @@
+apiVersion: v2
+name: cescalab
+description: Chart to deploy cescalab using generic applications chart
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+dependencies:
+  - name: base-application
+    alias: cescalab-be
+    version: 0.1.0
+    repository: "file://../../charts/applications"
+    condition: cescalab-be.enabled
+  - name: base-application
+    alias: cescalab-fe
+    version: 0.1.0
+    repository: "file://../../charts/applications"
+    condition: cescalab-fe.enabled
